@@ -1,1 +1,3 @@
-<h1>Old school snake game</h1>
+<h1>Old school Snake game</h1>
+
+run App.java to start
