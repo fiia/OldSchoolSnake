@@ -1,14 +1,19 @@
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.scene.text.TextAlignment;
 import javafx.scene.text.Font;
+
+import java.util.ArrayList;
+
 
 /**
  * @author josefiina
@@ -18,35 +23,80 @@ import javafx.scene.text.Font;
 
 
 public class App extends Application {
+        public static int gridsize = 20;
+        public static int grids = 30;
 
     @Override
     public void start(Stage window) throws Exception {
-        int gridsize = 20;
-        int grids = 30;
-        int speed = 7;
 
-        Canvas canvas = new Canvas(grids * gridsize, grids * gridsize);
+	window.setTitle("SNAKE");
+        Canvas canvas = new Canvas(grids * gridsize, (grids * gridsize)-200);
         GraphicsContext gc = canvas.getGraphicsContext2D();
+	showText("SNAKE", gc, canvas);
 
+        Snakegame snakegame = new Snakegame(grids, grids);
+
+	//TEXT GRAPHICS
+	BorderPane p = new BorderPane();
+     	p.setCenter(canvas);
+	Scene scene = new Scene(p);
+	
+	//BUTTONS
+	Button fast = new Button("FAST");
+	Button mid = new Button("MID");
+	Button slow = new Button("SLOW");
+	HBox hbox = new HBox();
+	hbox.setPrefHeight(100);
+	hbox.getChildren().addAll(fast, mid, slow);
+	ArrayList<Button> btns = new ArrayList<Button>();
+	btns.add(fast);
+	btns.add(mid);
+	btns.add(slow);
+	p.setBottom(hbox);
+
+	btns.stream().forEach(b -> {
+		b.setMinHeight(hbox.getPrefHeight());
+		b.setMinWidth(canvas.getWidth()/3);
+		b.setFont(new Font("Impact", 50));
+		b.setStyle("-fx-background-color: black; -fx-text-fill: white; -fx-border-style: solid;");
+	    });
+	
+	fast.setOnAction(actionEvent -> {
+		int speed = 12;
+		run(window, speed, snakegame);
+       	});
+
+	mid.setOnAction(actionEvent -> {
+		int speed = 8;
+		run(window, speed, snakegame);
+       	});
+
+	slow.setOnAction(actionEvent -> {
+		int speed = 3;
+		run(window, speed, snakegame);
+       	});
+	
+	window.setScene(scene);
+	window.show();
+
+    }
+
+    public void showText(String text, GraphicsContext gc, Canvas canvas) {
 	gc.setFill(Color.BLACK);
 	gc.fillRect(0, 0, grids * gridsize, grids * gridsize);
 	gc.setFill(Color.WHITE);
 	gc.setTextAlign(TextAlignment.CENTER);
 	gc.setFont(new Font("Impact", 100));
-	gc.fillText("GAME STARTS", canvas.getWidth()/2, canvas.getHeight()/2);
-	
-        Snakegame snakegame = new Snakegame(grids, grids);
-        
-        new AnimationTimer() {
-            private long prev;
-	    int count = 0;
+	gc.fillText(text, canvas.getWidth()/2, canvas.getHeight()/2);
 
-	    public void drawBackround(Color color) {
+    }
+
+    public void drawBackround(Color color, GraphicsContext gc) {
 		gc.setFill(color);
 	        gc.fillRect(0, 0, grids * gridsize, grids * gridsize);
 	    }
 
-	    public void drawSnake(Color color) {
+    public void drawSnake(Color color, Snakegame snakegame, GraphicsContext gc) {
 		gc.setFill(color);
 		snakegame.getSnake().getParts().stream()
 		    .forEach(part -> {
@@ -54,41 +104,53 @@ public class App extends Application {
 				    part.getY() * gridsize,
 				    gridsize, gridsize);
 			});
-	    }
+      }
 
-	    public void drawApple(Color color) {
+    public void drawApple(Color color, Snakegame snakegame, GraphicsContext gc) {
 		 gc.setFill(color);
 		 Apple apple = snakegame.getApple();
 	         gc.fillRect(apple.getX() * gridsize,
 			     apple.getY() * gridsize,
 			     gridsize, gridsize);
-	    }
+     }
 
-            @Override
-            public void handle(long now) {
+    public void run(Stage window, int speed, Snakegame snakegame) {
+	
+	Canvas canvas = new Canvas(grids * gridsize, grids * gridsize);
+	GraphicsContext gc = canvas.getGraphicsContext2D();
+	showText("GAME STARTS", gc, canvas);
+	
+	new AnimationTimer() {
+        private long prev;
+        int count = 0;
+	
 
-		if(count>70) {
-		    if (now - prev < 1_000_000_000 / 30) {
-			return;
-		    }
-		    prev = now;
-
-		    drawBackround(Color.BLACK);
-		    drawApple(Color.RED);
+        @Override
+        public void handle(long now) {
+	    if(count>70) {
+		if (now - prev < 1_000_000_000 / 30) {
+		    return;
+		}
+	        prev = now;
+		drawBackround(Color.BLACK, gc);
+	        drawApple(Color.RED, snakegame, gc);
 		
-		    if (snakegame.end()) {
-			drawSnake(Color.GRAY);
-			gc.setFill(Color.WHITE);
-			gc.fillText("GAME OVER\nscore: " + snakegame.getScore(),
+		if (snakegame.end()) {
+		    drawSnake(Color.GRAY, snakegame, gc);
+		    gc.setFill(Color.WHITE);
+		    gc.setTextAlign(TextAlignment.CENTER);
+		    gc.setFont(new Font("Impact", 100));
+		    gc.fillText("GAME OVER\nscore: " + snakegame.getScore(),
 				    canvas.getWidth()/2, canvas.getHeight()/2);
 
-			return;
-		    }
-		    drawSnake(Color.WHITE);
+		    return;
 		}
-		count = (count<71) ? count+1 : count;
+
+		drawSnake(Color.WHITE, snakegame, gc);
 	    }
-        }.start();
+	    count = (count<71) ? count+1 : count;
+	}
+	}.start();
 
         
         new AnimationTimer() {
@@ -108,15 +170,17 @@ public class App extends Application {
                     stop();
                 }
             }
-        }.start();
+	}.start();
 
-        BorderPane p = new BorderPane();
-        p.setCenter(canvas);
-
-        Scene scene = new Scene(p);
-
+	//GAME GRAPHICS
+	BorderPane snakebp = new BorderPane();
+       	snakebp.setCenter(canvas);
+	Scene snakeScene = new Scene(snakebp);
+      	window.setScene(snakeScene);
+	window.show();
+		
         //KEYBOARD LISTENER
-        scene.setOnKeyPressed((event) -> {
+        snakeScene.setOnKeyPressed((event) -> {
             if (event.getCode().equals(KeyCode.UP)) {
                 snakegame.getSnake().setDirection(Direction.UP);
             } else if (event.getCode().equals(KeyCode.DOWN)) {
@@ -127,11 +191,9 @@ public class App extends Application {
                 snakegame.getSnake().setDirection(Direction.LEFT);
             }
         });
+	
+	}
 
-	window.setScene(scene);
-	window.show();
-
-    }
 
     public static void main(String[] args) {
         launch(App.class);
