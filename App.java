@@ -12,6 +12,8 @@ import javafx.stage.Stage;
 import javafx.scene.text.TextAlignment;
 import javafx.scene.text.Font;
 
+import java.util.ArrayList;
+
 
 /**
  * @author josefiina
@@ -25,19 +27,14 @@ public class App extends Application {
         public static int grids = 30;
 
     @Override
-    public void start(Stage firstWindow) throws Exception {
+    public void start(Stage window) throws Exception {
 
-	firstWindow.setTitle("SNAKE");
-	
-        Canvas canvas = new Canvas(grids * gridsize, grids * gridsize);
+	window.setTitle("SNAKE");
+        Canvas canvas = new Canvas(grids * gridsize, (grids * gridsize)-200);
         GraphicsContext gc = canvas.getGraphicsContext2D();
-	gc.setFill(Color.BLACK);
-	gc.fillRect(0, 0, grids * gridsize, grids * gridsize);
-	gc.setFill(Color.WHITE);
-	gc.setTextAlign(TextAlignment.CENTER);
-	gc.setFont(new Font("Impact", 100));
-	gc.fillText("GAME STARTS", canvas.getWidth()/2, canvas.getHeight()/2);
+	showText("SNAKE", gc, canvas);
 
+        Snakegame snakegame = new Snakegame(grids, grids);
 
 	//TEXT GRAPHICS
 	BorderPane p = new BorderPane();
@@ -49,32 +46,48 @@ public class App extends Application {
 	Button mid = new Button("MID");
 	Button slow = new Button("SLOW");
 	HBox hbox = new HBox();
+	hbox.setPrefHeight(100);
 	hbox.getChildren().addAll(fast, mid, slow);
-	//TO DO: ALIGN HBOX & MAKE IT BETTER
+	ArrayList<Button> btns = new ArrayList<Button>();
+	btns.add(fast);
+	btns.add(mid);
+	btns.add(slow);
 	p.setBottom(hbox);
 
-        Snakegame snakegame = new Snakegame(grids, grids);
+	btns.stream().forEach(b -> {
+		b.setMinHeight(hbox.getPrefHeight());
+		b.setMinWidth(canvas.getWidth()/3);
+		b.setFont(new Font("Impact", 50));
+		b.setStyle("-fx-background-color: black; -fx-text-fill: white; -fx-border-style: solid;");
+	    });
 	
 	fast.setOnAction(actionEvent -> {
 		int speed = 12;
-		run(firstWindow, speed, canvas, gc, snakegame);
-
+		run(window, speed, snakegame);
        	});
 
 	mid.setOnAction(actionEvent -> {
 		int speed = 8;
-		run(firstWindow, speed, canvas, gc, snakegame);
-
+		run(window, speed, snakegame);
        	});
 
 	slow.setOnAction(actionEvent -> {
 		int speed = 3;
-		run(firstWindow, speed, canvas, gc, snakegame);
-
+		run(window, speed, snakegame);
        	});
+	
+	window.setScene(scene);
+	window.show();
 
-	firstWindow.setScene(scene);
-	firstWindow.show();
+    }
+
+    public void showText(String text, GraphicsContext gc, Canvas canvas) {
+	gc.setFill(Color.BLACK);
+	gc.fillRect(0, 0, grids * gridsize, grids * gridsize);
+	gc.setFill(Color.WHITE);
+	gc.setTextAlign(TextAlignment.CENTER);
+	gc.setFont(new Font("Impact", 100));
+	gc.fillText(text, canvas.getWidth()/2, canvas.getHeight()/2);
 
     }
 
@@ -101,10 +114,16 @@ public class App extends Application {
 			     gridsize, gridsize);
      }
 
-    public void run(Stage firstWindow, int speed, Canvas canvas, GraphicsContext gc, Snakegame snakegame) {
+    public void run(Stage window, int speed, Snakegame snakegame) {
+	
+	Canvas canvas = new Canvas(grids * gridsize, grids * gridsize);
+	GraphicsContext gc = canvas.getGraphicsContext2D();
+	showText("GAME STARTS", gc, canvas);
+	
 	new AnimationTimer() {
         private long prev;
         int count = 0;
+	
 
         @Override
         public void handle(long now) {
@@ -119,6 +138,8 @@ public class App extends Application {
 		if (snakegame.end()) {
 		    drawSnake(Color.GRAY, snakegame, gc);
 		    gc.setFill(Color.WHITE);
+		    gc.setTextAlign(TextAlignment.CENTER);
+		    gc.setFont(new Font("Impact", 100));
 		    gc.fillText("GAME OVER\nscore: " + snakegame.getScore(),
 				    canvas.getWidth()/2, canvas.getHeight()/2);
 
@@ -155,8 +176,8 @@ public class App extends Application {
 	BorderPane snakebp = new BorderPane();
        	snakebp.setCenter(canvas);
 	Scene snakeScene = new Scene(snakebp);
-      	firstWindow.setScene(snakeScene);
-	firstWindow.show();
+      	window.setScene(snakeScene);
+	window.show();
 		
         //KEYBOARD LISTENER
         snakeScene.setOnKeyPressed((event) -> {
