@@ -7,6 +7,7 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.scene.text.TextAlignment;
@@ -23,43 +24,62 @@ import java.util.ArrayList;
 
 
 public class App extends Application {
-        public static int gridsize = 20;
-        public static int grids = 30;
+    private int gridsize = 20;
+    private int grids = 30;
+    private Tools tools = new Tools(gridsize, grids);
 
     @Override
     public void start(Stage window) throws Exception {
-
 	window.setTitle("SNAKE");
         Canvas canvas = new Canvas(grids * gridsize, (grids * gridsize)-200);
         GraphicsContext gc = canvas.getGraphicsContext2D();
-	showText("SNAKE", gc, canvas);
+	tools.showText("SNAKE", gc, canvas);
 
+	//FIRST ASK IF MODE BASIC THEN SPEED
         Snakegame snakegame = new Snakegame(grids, grids);
 
-	//TEXT GRAPHICS
+	//TEXT SCENE
 	BorderPane p = new BorderPane();
      	p.setCenter(canvas);
 	Scene scene = new Scene(p);
+
+	//MODE BUTTONS
+	Button basic = new Button("BASIC");
+	Button notBasic = new Button("NEW");
+	ArrayList<Button> mbtns = new ArrayList<Button>();
+	mbtns.add(basic);
+	mbtns.add(notBasic);
+	HBox hboxFirst = new HBox();
+	hboxFirst.setPrefHeight(200);
+	hboxFirst.getChildren().addAll(basic, notBasic);
+	p.setBottom(hboxFirst);
+	tools.buttonLayout(mbtns, 2, hboxFirst, canvas.getWidth());
 	
-	//BUTTONS
+	//SPEED BUTTONS
 	Button fast = new Button("FAST");
 	Button mid = new Button("MID");
 	Button slow = new Button("SLOW");
 	HBox hbox = new HBox();
-	hbox.setPrefHeight(100);
+	hbox.setPrefHeight(200);
 	hbox.getChildren().addAll(fast, mid, slow);
-	ArrayList<Button> btns = new ArrayList<Button>();
-	btns.add(fast);
-	btns.add(mid);
-	btns.add(slow);
-	p.setBottom(hbox);
+	ArrayList<Button> sbtns = new ArrayList<Button>();
+	sbtns.add(fast);
+	sbtns.add(mid);
+	sbtns.add(slow);
+	tools.buttonLayout(sbtns, 3, hbox, canvas.getWidth());
+	
+	
+        basic.setOnAction(actionEvent -> {
+	       snakegame.setBasicMode(true);
+	       p.setBottom(hbox);
+	       tools.showText("SNAKE BASIC", gc, canvas);
+       	});
 
-	btns.stream().forEach(b -> {
-		b.setMinHeight(hbox.getPrefHeight());
-		b.setMinWidth(canvas.getWidth()/3);
-		b.setFont(new Font("Impact", 50));
-		b.setStyle("-fx-background-color: black; -fx-text-fill: white; -fx-border-style: solid;");
-	    });
+        notBasic.setOnAction(actionEvent -> {
+		snakegame.setBasicMode(false);
+		p.setBottom(hbox);
+		tools.showText("SNAKE NEW", gc, canvas);
+       	});
 	
 	fast.setOnAction(actionEvent -> {
 		int speed = 12;
@@ -81,77 +101,63 @@ public class App extends Application {
 
     }
 
-    public void showText(String text, GraphicsContext gc, Canvas canvas) {
-	gc.setFill(Color.BLACK);
-	gc.fillRect(0, 0, grids * gridsize, grids * gridsize);
-	gc.setFill(Color.WHITE);
-	gc.setTextAlign(TextAlignment.CENTER);
-	gc.setFont(new Font("Impact", 100));
-	gc.fillText(text, canvas.getWidth()/2, canvas.getHeight()/2);
-
-    }
-
-    public void drawBackround(Color color, GraphicsContext gc) {
-		gc.setFill(color);
-	        gc.fillRect(0, 0, grids * gridsize, grids * gridsize);
-	    }
-
-    public void drawSnake(Color color, Snakegame snakegame, GraphicsContext gc) {
-		gc.setFill(color);
-		snakegame.getSnake().getParts().stream()
-		    .forEach(part -> {
-			gc.fillRect(part.getX() * gridsize,
-				    part.getY() * gridsize,
-				    gridsize, gridsize);
-			});
-      }
-
-    public void drawApple(Color color, Snakegame snakegame, GraphicsContext gc) {
-		 gc.setFill(color);
-		 Apple apple = snakegame.getApple();
-	         gc.fillRect(apple.getX() * gridsize,
-			     apple.getY() * gridsize,
-			     gridsize, gridsize);
-     }
-
+   
     public void run(Stage window, int speed, Snakegame snakegame) {
-	
 	Canvas canvas = new Canvas(grids * gridsize, grids * gridsize);
 	GraphicsContext gc = canvas.getGraphicsContext2D();
-	showText("GAME STARTS", gc, canvas);
+	tools.showText("GAME STARTS", gc, canvas);
+
+	//GAME SCENE
+	AnchorPane ap = new AnchorPane();
+	ap.setPrefSize(grids * gridsize, grids * gridsize);
+	ap.setTopAnchor(canvas, 0.0);
+	ap.getChildren().addAll(canvas);
+       	Scene snakeScene = new Scene(ap);
+      	window.setScene(snakeScene);
+	window.show();
 	
 	new AnimationTimer() {
-        private long prev;
-        int count = 0;
-	
+	    private long prev;
+	    int count = 0;
 
-        @Override
-        public void handle(long now) {
-	    if(count>70) {
-		if (now - prev < 1_000_000_000 / 30) {
-		    return;
-		}
-	        prev = now;
-		drawBackround(Color.BLACK, gc);
-	        drawApple(Color.RED, snakegame, gc);
+	    @Override
+	    public void handle(long now) {
+		if(count>70) {
+		    if (now - prev < 1_000_000_000 / 30) {
+			return;
+		    }
+		    prev = now;
+		    tools.drawBackround(Color.BLACK, gc);
+		    tools.drawApple(Color.RED, snakegame, gc);
 		
-		if (snakegame.end()) {
-		    drawSnake(Color.GRAY, snakegame, gc);
-		    gc.setFill(Color.WHITE);
-		    gc.setTextAlign(TextAlignment.CENTER);
-		    gc.setFont(new Font("Impact", 100));
-		    gc.fillText("GAME OVER\nscore: " + snakegame.getScore(),
+		    if (snakegame.end()) {
+			tools.drawSnake(Color.GRAY, snakegame, gc);
+			gc.setFill(Color.WHITE);
+			gc.setTextAlign(TextAlignment.CENTER);
+			gc.setFont(new Font("Impact", 100));
+			gc.fillText("GAME OVER\nSCORE: " + snakegame.getScore(),
 				    canvas.getWidth()/2, canvas.getHeight()/2);
 
-		    return;
+			Button playAgain = new Button("PLAY AGAIN");
+			playAgain.setFont(new Font("Impact", 50));
+			playAgain.setStyle("-fx-background-color:black; -fx-text-fill:white; -fx-border-style:solid;");
+			ap.setBottomAnchor(playAgain, 10.0);
+			ap.getChildren().addAll(playAgain);
+
+			playAgain.setOnAction(actionEvent -> {
+				Snakegame newSnakegame = new Snakegame(grids, grids);
+				if(!snakegame.getMode()) { newSnakegame.setBasicMode(false); }
+				run(window, speed, newSnakegame);
+
+			    });
+			
+			return;
+		    }
+		    tools.drawSnake(Color.WHITE, snakegame, gc);
 		}
-
-		drawSnake(Color.WHITE, snakegame, gc);
+		count = (count<71) ? count+1 : count;
 	    }
-	    count = (count<71) ? count+1 : count;
-	}
 	}.start();
-
         
         new AnimationTimer() {
             private long prev;
@@ -172,12 +178,6 @@ public class App extends Application {
             }
 	}.start();
 
-	//GAME GRAPHICS
-	BorderPane snakebp = new BorderPane();
-       	snakebp.setCenter(canvas);
-	Scene snakeScene = new Scene(snakebp);
-      	window.setScene(snakeScene);
-	window.show();
 		
         //KEYBOARD LISTENER
         snakeScene.setOnKeyPressed((event) -> {
