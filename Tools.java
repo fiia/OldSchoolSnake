@@ -1,13 +1,8 @@
-//import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
-//import javafx.scene.input.KeyCode;
-//import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
-//import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
-//import javafx.stage.Stage;
 import javafx.scene.text.TextAlignment;
 import javafx.scene.text.Font;
 

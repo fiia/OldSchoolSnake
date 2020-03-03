@@ -15,13 +15,11 @@ import javafx.scene.text.Font;
 
 import java.util.ArrayList;
 
-
 /**
  * @author josefiina
  *
  * CLASS HANDLES GRAPHICS & TIMING
  */
-
 
 public class App extends Application {
     private int gridsize = 20;
@@ -35,7 +33,6 @@ public class App extends Application {
         GraphicsContext gc = canvas.getGraphicsContext2D();
 	tools.showText("SNAKE", gc, canvas);
 
-	//FIRST ASK IF MODE BASIC THEN SPEED
         Snakegame snakegame = new Snakegame(grids, grids);
 
 	//TEXT SCENE
@@ -100,7 +97,6 @@ public class App extends Application {
 	window.show();
 
     }
-
    
     public void run(Stage window, int speed, Snakegame snakegame) {
 	Canvas canvas = new Canvas(grids * gridsize, grids * gridsize);
@@ -193,7 +189,6 @@ public class App extends Application {
         });
 	
 	}
-
 
     public static void main(String[] args) {
         launch(App.class);
