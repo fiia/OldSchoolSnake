@@ -9,13 +9,17 @@ import java.util.ArrayList;
 public class Snake {
     private int x;
     private int y;
+    private int width;
+    private int heigth;
     private boolean growth;
     private Direction direction;
     private List<Part>snakeParts;
     
-    public Snake(int startX, int startY, Direction startDirection) {
+    public Snake(int startX, int startY, Direction startDirection, int width, int heigth) {
         this.x = startX;
         this.y = startY;
+	this.width = width;
+	this.heigth = heigth;
         this.growth = false;
         this.direction = startDirection;
         this.snakeParts = new ArrayList<>();
@@ -39,9 +43,9 @@ public class Snake {
     //HEAD AT THE END OF LIST
     public List<Part> getParts() { return this.snakeParts; }
 
-    public void grow() { this.growth=true; }
+    public void grow() { this.growth = true; }
     
-    public void move() {
+    public void basicMove() {
         //CREATE A NEW HEAD ACCORDING TO DIRECTION
 	int x = getHead().getX();
 	int y = getHead().getY();
@@ -52,11 +56,30 @@ public class Snake {
         if (this.direction==Direction.UP) { y--; }
         
         this.snakeParts.add(new Part(x, y));
-            
-        //KEEP SNAKE IN RIGHT SIZE
+        keepSize();
+    }
+
+    public void newMove() {
+	//IF GOES THROUGH WALL MOVE TO ANOTHER SIDE
+	int x = getHead().getX();
+	int y = getHead().getY();
+
+	if(x == 0 && this.direction == Direction.LEFT) { x = this.width-1; }
+	else if (x == this.width-1 && this.direction == Direction.RIGHT) { x = 0; }
+	else if (y == 0 && this.direction == Direction.UP) { y = this.heigth-1; }
+	else if (y == this.heigth-1 && this.direction == Direction.DOWN) { y = 0; }
+	else {
+	    basicMove();
+	    return;
+	}
+	
+	this.snakeParts.add(new Part(x, y));
+        keepSize();
+    }
+
+    public void keepSize() {
         if (!this.growth) { this.snakeParts.remove(0); }
-        
-        this.growth=false;
+	this.growth=false;
     }
     
     public boolean hit(Part part) {
@@ -69,6 +92,8 @@ public class Snake {
     }
 
     //CHECK IF SNAKES HEAD HITS ITS BODY
+    //TODO: DIES IF LEFT ARROW IS PRESSED WHILE DIRECTION IS RIGHT
+    //THIS IS ANNOYING
     public boolean hitsSelf() {
 	for (int i=0; i<this.snakeParts.size()-1; i++) {
 	    if (getHead().hit(this.snakeParts.get(i))) {

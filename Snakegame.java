@@ -5,10 +5,14 @@ import java.util.Random;
  * @author josefiina
  */
 
+
+//TODO: PASS THROUGH WALLS MODE
+
 public class Snakegame {
     private int width;
     private int heigth;
     private int score;
+    private boolean basic;
     private Snake snake;
     private Apple apple;
     
@@ -16,9 +20,22 @@ public class Snakegame {
         this.width = width;
         this.heigth = heigth;
 	this.score = 0;
-        this.snake = new Snake(this.width/2, 0, Direction.DOWN);
+	this.basic = true; //DIES IF HITS A WALL
+        this.snake = new Snake(this.width/2, 0, Direction.DOWN, this.width, this.heigth);
         setApple(new Apple(new Random().nextInt(this.width),
                 new Random().nextInt(this.heigth)));
+    }
+
+    public void setBasicMode(boolean isBasic) { this.basic = isBasic; }
+
+    public boolean getMode() { return this.basic; }
+
+    public int getWidth() {
+	return this.width;
+    }
+
+    public int getHeigth() {
+	return this.heigth;
     }
     
     public Snake getSnake() { return this.snake; }
@@ -30,8 +47,16 @@ public class Snakegame {
     public void setApple(Apple apple) { this.apple = apple; }
 
     public int getScore() { return this.score; }
-    
+
     public boolean end() {
+	return (this.basic) ? basicEnd() : newEnd();
+    }
+
+    public boolean newEnd() {
+	return this.snake.hitsSelf();
+    }
+    
+    public boolean basicEnd() {
         Part part = snake.getHead();
         return ((part.getX()>this.width-1 || part.getX()<0) ||
                 (part.getY()>this.heigth-1 || part.getY()<0)) ||
@@ -39,7 +64,11 @@ public class Snakegame {
     }
     
     public void refresh() {
-        this.snake.move();
+	if (this.basic) {
+	    this.snake.basicMove();
+	} else {
+	    this.snake.newMove();
+	}
         
         if (snake.hit(apple)) {
             snake.grow();
