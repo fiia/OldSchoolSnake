@@ -49,12 +49,15 @@ public class Snake {
         //CREATE A NEW HEAD ACCORDING TO DIRECTION
 	int x = getHead().getX();
 	int y = getHead().getY();
-        
-        if (this.direction==Direction.RIGHT) { x++; }
-        if (this.direction==Direction.LEFT) { x--; }
-        if (this.direction==Direction.DOWN) { y++; }
-        if (this.direction==Direction.UP) { y--; }
-        
+
+	switch(this.direction) {
+	    case RIGHT: x++; break;
+	    case LEFT: x--; break;
+	    case DOWN: y++; break;
+  	    case UP: y--; break;
+	    default: break;
+	}
+	
         this.snakeParts.add(new Part(x, y));
         keepSize();
     }
@@ -91,7 +94,6 @@ public class Snake {
         return false;
     }
 
-    //CHECK IF SNAKES HEAD HITS ITS BODY
     //TODO: DIES IF LEFT ARROW IS PRESSED WHILE DIRECTION IS RIGHT
     //THIS IS ANNOYING
     public boolean hitsSelf() {
