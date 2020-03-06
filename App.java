@@ -29,10 +29,9 @@ public class App extends Application {
     @Override
     public void start(Stage window) throws Exception {
 	window.setTitle("SNAKE");
-        Canvas canvas = new Canvas(grids * gridsize, (grids * gridsize)-200);
+        Canvas canvas = new Canvas(grids * gridsize, grids * gridsize/3*2);
         GraphicsContext gc = canvas.getGraphicsContext2D();
-	tools.showText("SNAKE", gc, canvas);
-
+	tools.showText("SNAKE", gc, canvas, false);
         Snakegame snakegame = new Snakegame(grids, grids);
 
 	//TEXT SCENE
@@ -47,7 +46,7 @@ public class App extends Application {
 	mbtns.add(basic);
 	mbtns.add(notBasic);
 	HBox hboxFirst = new HBox();
-	hboxFirst.setPrefHeight(200);
+	hboxFirst.setPrefHeight(grids * gridsize/3);
 	hboxFirst.getChildren().addAll(basic, notBasic);
 	p.setBottom(hboxFirst);
 	tools.buttonLayout(mbtns, 2, hboxFirst, canvas.getWidth());
@@ -57,7 +56,7 @@ public class App extends Application {
 	Button mid = new Button("MID");
 	Button slow = new Button("SLOW");
 	HBox hbox = new HBox();
-	hbox.setPrefHeight(200);
+	hbox.setPrefHeight(grids * gridsize/3);
 	hbox.getChildren().addAll(fast, mid, slow);
 	ArrayList<Button> sbtns = new ArrayList<Button>();
 	sbtns.add(fast);
@@ -65,32 +64,31 @@ public class App extends Application {
 	sbtns.add(slow);
 	tools.buttonLayout(sbtns, 3, hbox, canvas.getWidth());
 	
-	
         basic.setOnAction(actionEvent -> {
 	       snakegame.setBasicMode(true);
 	       p.setBottom(hbox);
-	       tools.showText("SNAKE BASIC", gc, canvas);
+	       tools.showText("SNAKE BASIC", gc, canvas, false);
        	});
 
         notBasic.setOnAction(actionEvent -> {
 		snakegame.setBasicMode(false);
 		p.setBottom(hbox);
-		tools.showText("SNAKE NEW", gc, canvas);
+		tools.showText("SNAKE NEW", gc, canvas, false);
        	});
 	
 	fast.setOnAction(actionEvent -> {
 		int speed = 12;
-		run(window, speed, snakegame);
+		run(window, speed, snakegame, hbox);
        	});
 
 	mid.setOnAction(actionEvent -> {
 		int speed = 8;
-		run(window, speed, snakegame);
+		run(window, speed, snakegame, hbox);
        	});
 
 	slow.setOnAction(actionEvent -> {
-		int speed = 3;
-		run(window, speed, snakegame);
+		int speed = 4;
+		run(window, speed, snakegame, hbox);
        	});
 	
 	window.setScene(scene);
@@ -98,10 +96,10 @@ public class App extends Application {
 
     }
    
-    public void run(Stage window, int speed, Snakegame snakegame) {
+    public void run(Stage window, int speed, Snakegame snakegame, HBox hbox) {
 	Canvas canvas = new Canvas(grids * gridsize, grids * gridsize);
 	GraphicsContext gc = canvas.getGraphicsContext2D();
-	tools.showText("GAME STARTS", gc, canvas);
+	tools.showText("GAME STARTS", gc, canvas, false);
 
 	//GAME SCENE
 	AnchorPane ap = new AnchorPane();
@@ -128,23 +126,15 @@ public class App extends Application {
 		
 		    if (snakegame.end()) {
 			tools.drawSnake(Color.GRAY, snakegame, gc);
-			gc.setFill(Color.WHITE);
-			gc.setTextAlign(TextAlignment.CENTER);
-			gc.setFont(new Font("Impact", 100));
-			gc.fillText("GAME OVER\nSCORE: " + snakegame.getScore(),
-				    canvas.getWidth()/2, canvas.getHeight()/2);
-
-			Button playAgain = new Button("PLAY AGAIN");
-			playAgain.setFont(new Font("Impact", 50));
-			playAgain.setStyle("-fx-background-color:black; -fx-text-fill:white; -fx-border-style:solid;");
-			ap.setBottomAnchor(playAgain, 10.0);
-			ap.getChildren().addAll(playAgain);
-
+			String endScore = "GAME OVER\nSCORE: " + snakegame.getScore();
+			tools.showText(endScore, gc, canvas, true);			
+	
+			Button playAgain = new Button("NEW GAME");
+			tools.endButton(playAgain, ap);
 			playAgain.setOnAction(actionEvent -> {
-				Snakegame newSnakegame = new Snakegame(grids, grids);
-				if(!snakegame.getMode()) { newSnakegame.setBasicMode(false); }
-				run(window, speed, newSnakegame);
-
+			    Snakegame newSnakegame = new Snakegame(grids, grids);
+			    if(!snakegame.getMode()) { newSnakegame.setBasicMode(false); }
+				run(window, speed, newSnakegame, hbox);
 			    });
 			
 			return;
@@ -160,35 +150,30 @@ public class App extends Application {
 
             @Override
             public void handle(long now) {
-                
                 if (now - prev < 1_000_000_000 / speed) {
                     return;
                 }
                 prev = now;
-
                 snakegame.refresh();
-
                 if (snakegame.end()) {
                     stop();
                 }
             }
 	}.start();
 
-		
         //KEYBOARD LISTENER
         snakeScene.setOnKeyPressed((event) -> {
-            if (event.getCode().equals(KeyCode.UP)) {
-                snakegame.getSnake().setDirection(Direction.UP);
-            } else if (event.getCode().equals(KeyCode.DOWN)) {
-                snakegame.getSnake().setDirection(Direction.DOWN);
-            } else if (event.getCode().equals(KeyCode.RIGHT)) {
-                snakegame.getSnake().setDirection(Direction.RIGHT);
-            } else if (event.getCode().equals(KeyCode.LEFT)) {
-                snakegame.getSnake().setDirection(Direction.LEFT);
-            }
+            KeyCode kc = event.getCode();
+	    switch(kc) {
+       	        case UP: snakegame.getSnake().setDirection(Direction.UP); break;
+	        case DOWN: snakegame.getSnake().setDirection(Direction.DOWN); break;
+       	        case RIGHT: snakegame.getSnake().setDirection(Direction.RIGHT); break;
+	        case LEFT: snakegame.getSnake().setDirection(Direction.LEFT); break;
+	        default: break;
+	    }
         });
 	
-	}
+    }
 
     public static void main(String[] args) {
         launch(App.class);
