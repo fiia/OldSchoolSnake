@@ -7,12 +7,12 @@ import java.util.Random;
  */
 
 public class Snakegame {
-    private int width;
-    private int heigth;
+    protected int width;
+    protected int heigth;
     private int score;
-    private boolean basic;
+    protected boolean basic;
     private Snake snake;
-    private Apple apple;
+    protected Apple apple;
     
     public Snakegame(int width, int heigth) {
         this.width = width;
