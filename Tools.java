@@ -25,35 +25,42 @@ public class Tools {
 	this.grids = grids;
     }
 
-     public void buttonLayout(ArrayList<Button> btns, int numButtons, HBox hbox, double width) {
+    public void buttonLayout(ArrayList<Button> btns, int numButtons,
+			     HBox hbox, double width) {
 	btns.stream().forEach(b -> {
 	    b.setMinHeight(hbox.getPrefHeight());
 	    b.setMinWidth(width/numButtons);
-	    b.setFont(new Font("Impact", (grids * gridsize)/12));
+	    b.setFont(new Font("Impact", (grids * gridsize)/20));
 	    b.setStyle("-fx-background-color:black;-fx-text-fill:white;-fx-border-style:solid;");
 	    });
     }
 
-    public void endButton(Button playAgain, AnchorPane ap) {	
-	playAgain.setFont(new Font("Impact", (grids * gridsize)/12));
-	playAgain.setStyle("-fx-background-color:black;-fx-text-fill:white;-fx-border-style:solid;");
-        HBox hboxEnd = new HBox();
+    public void endButtons(ArrayList<Button>ebtns, AnchorPane ap) {
+	HBox hboxEnd = new HBox();
 	hboxEnd.setPrefSize(grids * gridsize, (grids * gridsize)/3);
 	hboxEnd.setAlignment(Pos.CENTER);
-	hboxEnd.getChildren().addAll(playAgain);
+	
+	ebtns.stream().forEach(b -> {
+    	    b.setFont(new Font("Impact", (grids * gridsize)/12));
+	    b.setStyle("-fx-background-color:black;-fx-text-fill:white;-fx-border-style:solid;");
+	    hboxEnd.getChildren().add(b);
+	    });
+        
        	ap.setBottomAnchor(hboxEnd, 0.0);
 	ap.getChildren().addAll(hboxEnd);
     }
 
     public void showText(String text, GraphicsContext gc, Canvas canvas, boolean end) {
+	double y = (text.length() > 20) ? canvas.getHeight()/3 : canvas.getHeight()/2;
+	double fsize = (text.length() > 20) ? grids * gridsize/8 : grids * gridsize/6;
 	if(!end) {
 	    gc.setFill(Color.BLACK);
 	    gc.fillRect(0, 0, grids * gridsize, grids * gridsize);
 	}
 	gc.setFill(Color.WHITE);
 	gc.setTextAlign(TextAlignment.CENTER);
-	gc.setFont(new Font("Impact", (grids * gridsize)/6));
-	gc.fillText(text, canvas.getWidth()/2, canvas.getHeight()/2);
+	gc.setFont(new Font("Impact", fsize));
+	gc.fillText(text, canvas.getWidth()/2, y);
     }
 
     public void drawBackround(Color color, GraphicsContext gc) {
@@ -61,9 +68,9 @@ public class Tools {
 	        gc.fillRect(0, 0, grids * gridsize, grids * gridsize);
 	    }
 
-    public void drawSnake(Color color, Snakegame snakegame, GraphicsContext gc) {
+    public void drawSnake(Color color, Snake snake, GraphicsContext gc) {
 		gc.setFill(color);
-		snakegame.getSnake().getParts().stream()
+		snake.getParts().stream()
 		    .forEach(part -> {
 			gc.fillRect(part.getX() * gridsize,
 				    part.getY() * gridsize,
@@ -78,5 +85,6 @@ public class Tools {
 			     apple.getY() * gridsize,
 			     gridsize, gridsize);
      }
+
 
 }

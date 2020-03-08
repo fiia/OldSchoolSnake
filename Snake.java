@@ -6,6 +6,8 @@ import java.util.ArrayList;
  *
  */
 
+//START CREATES ONLY ONE PART NOW
+
 public class Snake {
     private int x;
     private int y;
@@ -25,10 +27,12 @@ public class Snake {
         this.snakeParts = new ArrayList<>();
         start(startX, startY, direction);
     }
-    
-    public void start(int startX, int startY, Direction direction) {
-        for(int i=0; i<4; i++) {
-            this.snakeParts.add(new Part(startX, startY+i));
+
+    //ADDS 4 PARTS TO SNAKE, NOW START DIR CAN ONLY BE UP OR DOWN
+    public void start(int startX, int startY, Direction dir) {
+	 for(int i=0; i<4; i++) {
+	     int newY = (dir == Direction.DOWN) ? startY+i : startY-i;
+             this.snakeParts.add(new Part(startX, newY));
         }
     }
     
@@ -86,12 +90,17 @@ public class Snake {
     }
     
     public boolean hit(Part part) {
+
+	//return getHead().hit(part);
+
+	
         for(Part p : this.snakeParts) {
 	    if (p.hit(part)) {
                 return true;
             }
         }
         return false;
+	
     }
 
     //TODO: DIES IF LEFT ARROW IS PRESSED WHILE DIRECTION IS RIGHT

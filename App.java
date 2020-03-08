@@ -21,18 +21,28 @@ import java.util.ArrayList;
  * CLASS HANDLES GRAPHICS & TIMING
  */
 
+//TODO: SPACE PAUSES
+//TODO: PREV BUTTON
+//TODO: HANDLE BOTH PLAYERS DYING AT THE SAME TIME
+
 public class App extends Application {
     private int gridsize = 20;
     private int grids = 30;
     private Tools tools = new Tools(gridsize, grids);
+    private boolean onePlayer = true;
 
     @Override
     public void start(Stage window) throws Exception {
+	startForReal(window);
+    }
+
+    public void startForReal(Stage window) {
 	window.setTitle("SNAKE");
         Canvas canvas = new Canvas(grids * gridsize, grids * gridsize/3*2);
         GraphicsContext gc = canvas.getGraphicsContext2D();
 	tools.showText("SNAKE", gc, canvas, false);
         Snakegame snakegame = new Snakegame(grids, grids);
+	Multisnake multisnake = new Multisnake(grids, grids);
 
 	//TEXT SCENE
 	BorderPane p = new BorderPane();
@@ -42,14 +52,18 @@ public class App extends Application {
 	//MODE BUTTONS
 	Button basic = new Button("BASIC");
 	Button notBasic = new Button("NEW");
+	Button multiBasic = new Button("TWO\nPLAYERS\nBASIC");
+	Button multiNew = new Button("TWO\nPLAYERS\nNEW");
 	ArrayList<Button> mbtns = new ArrayList<Button>();
 	mbtns.add(basic);
 	mbtns.add(notBasic);
+	mbtns.add(multiBasic);
+	mbtns.add(multiNew);
 	HBox hboxFirst = new HBox();
 	hboxFirst.setPrefHeight(grids * gridsize/3);
-	hboxFirst.getChildren().addAll(basic, notBasic);
+	hboxFirst.getChildren().addAll(basic, notBasic, multiBasic, multiNew);
 	p.setBottom(hboxFirst);
-	tools.buttonLayout(mbtns, 2, hboxFirst, canvas.getWidth());
+	tools.buttonLayout(mbtns, 4, hboxFirst, canvas.getWidth());
 	
 	//SPEED BUTTONS
 	Button fast = new Button("FAST");
@@ -65,30 +79,51 @@ public class App extends Application {
 	tools.buttonLayout(sbtns, 3, hbox, canvas.getWidth());
 	
         basic.setOnAction(actionEvent -> {
-	       snakegame.setBasicMode(true);
-	       p.setBottom(hbox);
-	       tools.showText("SNAKE BASIC", gc, canvas, false);
+		window.setTitle("SNAKE BASIC");
+		snakegame.setBasicMode(true);
+		p.setBottom(hbox);
+		tools.showText("SNAKE BASIC", gc, canvas, false);
        	});
 
         notBasic.setOnAction(actionEvent -> {
+		window.setTitle("SNAKE NEW");
 		snakegame.setBasicMode(false);
 		p.setBottom(hbox);
 		tools.showText("SNAKE NEW", gc, canvas, false);
        	});
+
+	multiBasic.setOnAction(actionEvent -> {
+		window.setTitle("SNAKE BASIC TWO PLAYERS");
+		p.setBottom(hbox);
+		tools.showText("SNAKE BASIC\nTWO PLAYERS", gc, canvas, false);
+		onePlayer = false;
+		multisnake.setBasicMode(true);
+	    });
+
+	multiNew.setOnAction(actionEvent -> {
+		window.setTitle("SNAKE NEW TWO PLAYERS");
+		p.setBottom(hbox);
+		tools.showText("SNAKE NEW\nTWO PLAYERS", gc, canvas, false);
+		onePlayer = false;
+		multisnake.setBasicMode(false);
+	    });
 	
 	fast.setOnAction(actionEvent -> {
 		int speed = 12;
-		run(window, speed, snakegame, hbox);
+		if(onePlayer) { run(window, speed, snakegame, hbox); }
+	       	else { runTwo(window, speed, multisnake, hbox); }
        	});
 
 	mid.setOnAction(actionEvent -> {
 		int speed = 8;
-		run(window, speed, snakegame, hbox);
+		if(onePlayer) { run(window, speed, snakegame, hbox); }
+	       	else { runTwo(window, speed, multisnake, hbox); }
        	});
 
 	slow.setOnAction(actionEvent -> {
 		int speed = 4;
-		run(window, speed, snakegame, hbox);
+		if(onePlayer) { run(window, speed, snakegame, hbox); }
+	       	else { runTwo(window, speed, multisnake, hbox); }
        	});
 	
 	window.setScene(scene);
@@ -125,21 +160,30 @@ public class App extends Application {
 		    tools.drawApple(Color.RED, snakegame, gc);
 		
 		    if (snakegame.end()) {
-			tools.drawSnake(Color.GRAY, snakegame, gc);
+			tools.drawSnake(Color.GRAY, snakegame.getSnake(), gc);
 			String endScore = "GAME OVER\nSCORE: " + snakegame.getScore();
 			tools.showText(endScore, gc, canvas, true);			
 	
 			Button playAgain = new Button("NEW GAME");
-			tools.endButton(playAgain, ap);
+			Button menu = new Button("MAIN MENU");
+			ArrayList<Button>ebtns = new ArrayList<Button>();
+			ebtns.add(playAgain);
+			ebtns.add(menu);
+			tools.endButtons(ebtns, ap);
+			
 			playAgain.setOnAction(actionEvent -> {
 			    Snakegame newSnakegame = new Snakegame(grids, grids);
 			    if(!snakegame.getMode()) { newSnakegame.setBasicMode(false); }
 				run(window, speed, newSnakegame, hbox);
 			    });
 			
+			menu.setOnAction(actionEvent -> {
+				startForReal(window);
+			    });
+			
 			return;
 		    }
-		    tools.drawSnake(Color.WHITE, snakegame, gc);
+		    tools.drawSnake(Color.WHITE, snakegame.getSnake(), gc);
 		}
 		count = (count<71) ? count+1 : count;
 	    }
@@ -173,6 +217,107 @@ public class App extends Application {
 	    }
         });
 	
+    }
+
+    public void runTwo(Stage window, int speed, Multisnake multisnake, HBox hbox) {
+	Canvas canvas = new Canvas(grids * gridsize, grids * gridsize);
+	GraphicsContext gc = canvas.getGraphicsContext2D();
+	tools.showText("GAME STARTS\nBLUE USE WASD\nGREEN USE ARROWS", gc, canvas, false);
+
+	//GAME SCENE
+	AnchorPane ap = new AnchorPane();
+	ap.setPrefSize(grids * gridsize, grids * gridsize);
+	ap.setTopAnchor(canvas, 0.0);
+	ap.getChildren().addAll(canvas);
+       	Scene snakeScene = new Scene(ap);
+      	window.setScene(snakeScene);
+	window.show();
+	
+
+	new AnimationTimer() {
+	    private long prev;
+	    int count = 0;
+
+	    @Override
+	    public void handle(long now) {
+	       	if(count>70) {
+		    if (now - prev < 1_000_000_000 / 30) {
+			return;
+		    }
+		    prev = now;
+		    tools.drawBackround(Color.BLACK, gc);
+		    tools.drawApple(Color.RED, multisnake, gc);
+		
+		    if (multisnake.end()) {
+		        tools.drawSnake(Color.GRAY, multisnake.getLoser().getSnake(), gc);
+			tools.drawSnake(multisnake.getWinner().getColor(),
+					multisnake.getWinner().getSnake(), gc);
+			
+			String endScore = "GAME OVER\nWINNER SCORE :" +
+			    multisnake.getWinner().getScore() + "\nLOSER SCORE: " +
+			    multisnake.getLoser().getScore();
+			tools.showText(endScore, gc, canvas, true);			
+	
+			Button playAgain = new Button("NEW GAME");
+			Button menu = new Button("MAIN MENU");
+			ArrayList<Button>ebtns = new ArrayList<Button>();
+			ebtns.add(playAgain);
+			ebtns.add(menu);
+			tools.endButtons(ebtns, ap);
+			
+			playAgain.setOnAction(actionEvent -> {
+			    Multisnake newMultisnake = new Multisnake(grids, grids);
+			    if(!multisnake.getMode()) { newMultisnake.setBasicMode(false); }
+				runTwo(window, speed, newMultisnake, hbox);
+			    });
+			
+			menu.setOnAction(actionEvent -> {
+				startForReal(window);
+			    });
+			
+			return;
+		    }
+		    tools.drawSnake(multisnake.getLuigi().getColor(),
+				    multisnake.getLuigi().getSnake(), gc);
+		    tools.drawSnake(multisnake.getMario().getColor(),
+				    multisnake.getMario().getSnake(), gc);
+		}
+	    count = (count<71) ? count+1 : count;
+	    }
+	}.start();
+
+	new AnimationTimer() {
+            private long prev;
+
+            @Override
+            public void handle(long now) {
+                if (now - prev < 1_000_000_000 / speed) {
+                    return;
+                }
+                prev = now;
+                multisnake.refresh();
+                if (multisnake.end()) {
+                    stop();
+                }
+            }
+	}.start();
+
+	 //KEYBOARD LISTENER
+        snakeScene.setOnKeyPressed((event) -> {
+            KeyCode kc = event.getCode();
+	    switch(kc) {
+	    case UP: multisnake.getLuigi().getSnake().setDirection(Direction.UP); break;
+	    case DOWN: multisnake.getLuigi().getSnake().setDirection(Direction.DOWN); break;
+	    case RIGHT: multisnake.getLuigi().getSnake().setDirection(Direction.RIGHT); break;
+	    case LEFT: multisnake.getLuigi().getSnake().setDirection(Direction.LEFT); break;
+       	    case W: multisnake.getMario().getSnake().setDirection(Direction.UP); break;
+	    case S: multisnake.getMario().getSnake().setDirection(Direction.DOWN); break;
+	    case D: multisnake.getMario().getSnake().setDirection(Direction.RIGHT); break;
+	    case A: multisnake.getMario().getSnake().setDirection(Direction.LEFT); break;
+	        default: break;
+	    }
+        });
+
     }
 
     public static void main(String[] args) {
