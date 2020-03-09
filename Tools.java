@@ -30,9 +30,18 @@ public class Tools {
 	btns.stream().forEach(b -> {
 	    b.setMinHeight(hbox.getPrefHeight());
 	    b.setMinWidth(width/numButtons);
-	    b.setFont(new Font("Impact", (grids * gridsize)/20));
+	    b.setFont(new Font("Impact", (grids * gridsize)/19));
 	    b.setStyle("-fx-background-color:black;-fx-text-fill:white;-fx-border-style:solid;");
 	    });
+    }
+
+    public ArrayList<Button> createEndButtons() {
+	Button playAgain = new Button("NEW GAME");
+	Button menu = new Button("MAIN MENU");
+	ArrayList<Button>ebtns = new ArrayList<Button>();
+	ebtns.add(playAgain);
+	ebtns.add(menu);
+	return ebtns;
     }
 
     public void endButtons(ArrayList<Button>ebtns, AnchorPane ap) {
@@ -52,7 +61,7 @@ public class Tools {
 
     public void showText(String text, GraphicsContext gc, Canvas canvas, boolean end) {
 	double y = (text.length() > 20) ? canvas.getHeight()/3 : canvas.getHeight()/2;
-	double fsize = (text.length() > 20) ? grids * gridsize/8 : grids * gridsize/6;
+	double fsize = (text.length() > 17) ? grids * gridsize/8 : grids * gridsize/6;
 	if(!end) {
 	    gc.setFill(Color.BLACK);
 	    gc.fillRect(0, 0, grids * gridsize, grids * gridsize);
@@ -86,5 +95,22 @@ public class Tools {
 			     gridsize, gridsize);
      }
 
+    public void drawDeadSnakes(Multisnake multisnake, GraphicsContext gc, Canvas canvas) {
+	if(multisnake.bothDie()) {
+	    drawSnake(Color.GRAY, multisnake.getLuigi().getSnake(), gc);
+	    drawSnake(Color.GRAY, multisnake.getMario().getSnake(), gc);
+	    String endScore = "EVERYBODY\nDIES";
+	    showText(endScore, gc, canvas, true);
+	} else {
+	    drawSnake(Color.GRAY, multisnake.getLoser().getSnake(), gc);
+	    drawSnake(multisnake.getWinner().getColor(),
+			    multisnake.getWinner().getSnake(), gc);
+			
+	    String endScore = "GAME OVER\nWINNER SCORE: " +
+			multisnake.getWinner().getScore() + "\nLOSER SCORE: " +
+			multisnake.getLoser().getScore();
+	    showText(endScore, gc, canvas, true);			
+	}
+    }
 
 }

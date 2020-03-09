@@ -13,9 +13,9 @@ public class Multisnake extends Snakegame {
     
     public Multisnake(int width, int heigth) {
 	super(width, heigth);
-	this.luigi = new Player(0, 0, Direction.DOWN, width, heigth, Color.GREEN);
+	this.luigi = new Player(0, 0, Direction.DOWN, width, heigth, Color.CYAN);
 	this.mario = new Player(this.width-1, this.heigth-1, Direction.UP,
-				width, heigth, Color.BLUE);
+				width, heigth, Color.GOLD);
         
     }
 
@@ -25,6 +25,10 @@ public class Multisnake extends Snakegame {
     
     public Player getLoser() {
 	return (luigi.getWin()) ? mario : luigi;
+    }
+
+    public boolean bothDie() {
+	return (luigi.getWin() && mario.getWin());
     }
 
     public Player getLuigi() { return this.luigi; }

@@ -82,6 +82,7 @@ public class App extends Application {
 		window.setTitle("SNAKE BASIC");
 		snakegame.setBasicMode(true);
 		p.setBottom(hbox);
+		onePlayer = true;
 		tools.showText("SNAKE BASIC", gc, canvas, false);
        	});
 
@@ -89,6 +90,7 @@ public class App extends Application {
 		window.setTitle("SNAKE NEW");
 		snakegame.setBasicMode(false);
 		p.setBottom(hbox);
+		onePlayer = true;
 		tools.showText("SNAKE NEW", gc, canvas, false);
        	});
 
@@ -157,27 +159,23 @@ public class App extends Application {
 		    }
 		    prev = now;
 		    tools.drawBackround(Color.BLACK, gc);
-		    tools.drawApple(Color.RED, snakegame, gc);
+		    tools.drawApple(Color.ORANGERED, snakegame, gc);
 		
 		    if (snakegame.end()) {
 			tools.drawSnake(Color.GRAY, snakegame.getSnake(), gc);
 			String endScore = "GAME OVER\nSCORE: " + snakegame.getScore();
 			tools.showText(endScore, gc, canvas, true);			
-	
-			Button playAgain = new Button("NEW GAME");
-			Button menu = new Button("MAIN MENU");
-			ArrayList<Button>ebtns = new ArrayList<Button>();
-			ebtns.add(playAgain);
-			ebtns.add(menu);
+
+		    	ArrayList<Button>ebtns = tools.createEndButtons();
 			tools.endButtons(ebtns, ap);
 			
-			playAgain.setOnAction(actionEvent -> {
+			ebtns.get(0).setOnAction(actionEvent -> {
 			    Snakegame newSnakegame = new Snakegame(grids, grids);
 			    if(!snakegame.getMode()) { newSnakegame.setBasicMode(false); }
 				run(window, speed, newSnakegame, hbox);
 			    });
 			
-			menu.setOnAction(actionEvent -> {
+			ebtns.get(1).setOnAction(actionEvent -> {
 				startForReal(window);
 			    });
 			
@@ -222,7 +220,7 @@ public class App extends Application {
     public void runTwo(Stage window, int speed, Multisnake multisnake, HBox hbox) {
 	Canvas canvas = new Canvas(grids * gridsize, grids * gridsize);
 	GraphicsContext gc = canvas.getGraphicsContext2D();
-	tools.showText("GAME STARTS\nBLUE USE WASD\nGREEN USE ARROWS", gc, canvas, false);
+	tools.showText("GAME STARTS\nYELLOW USE WASD\nBLUE USE ARROWS", gc, canvas, false);
 
 	//GAME SCENE
 	AnchorPane ap = new AnchorPane();
@@ -246,32 +244,21 @@ public class App extends Application {
 		    }
 		    prev = now;
 		    tools.drawBackround(Color.BLACK, gc);
-		    tools.drawApple(Color.RED, multisnake, gc);
+		    tools.drawApple(Color.ORANGERED, multisnake, gc);
 		
 		    if (multisnake.end()) {
-		        tools.drawSnake(Color.GRAY, multisnake.getLoser().getSnake(), gc);
-			tools.drawSnake(multisnake.getWinner().getColor(),
-					multisnake.getWinner().getSnake(), gc);
+			tools.drawDeadSnakes(multisnake, gc, canvas);
 			
-			String endScore = "GAME OVER\nWINNER SCORE :" +
-			    multisnake.getWinner().getScore() + "\nLOSER SCORE: " +
-			    multisnake.getLoser().getScore();
-			tools.showText(endScore, gc, canvas, true);			
-	
-			Button playAgain = new Button("NEW GAME");
-			Button menu = new Button("MAIN MENU");
-			ArrayList<Button>ebtns = new ArrayList<Button>();
-			ebtns.add(playAgain);
-			ebtns.add(menu);
+			ArrayList<Button>ebtns = tools.createEndButtons();
 			tools.endButtons(ebtns, ap);
 			
-			playAgain.setOnAction(actionEvent -> {
+			ebtns.get(0).setOnAction(actionEvent -> {
 			    Multisnake newMultisnake = new Multisnake(grids, grids);
 			    if(!multisnake.getMode()) { newMultisnake.setBasicMode(false); }
 				runTwo(window, speed, newMultisnake, hbox);
 			    });
 			
-			menu.setOnAction(actionEvent -> {
+			ebtns.get(1).setOnAction(actionEvent -> {
 				startForReal(window);
 			    });
 			
