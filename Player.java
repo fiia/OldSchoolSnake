@@ -31,4 +31,9 @@ public class Player {
 
     public Color getColor() { return this.color; }
 
+    public void reset(int startX, int startY, Direction startDirection) {
+	this.score = 0;
+	this.snake.reset(startX, startY, startDirection);
+	this.winner = false;
+    }
 }

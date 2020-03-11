@@ -36,6 +36,22 @@ public class Multisnake extends Snakegame {
     public Player getMario() { return this.mario; }
 
     @Override
+    public void setApple() {
+	apple.reset(new Random().nextInt(this.width),
+                new Random().nextInt(this.heigth));
+	while(!luigi.getSnake().hitBody(apple) &&
+	      !mario.getSnake().hitBody(apple)) {
+	    apple.reset(new Random().nextInt(this.width),
+                new Random().nextInt(this.heigth));
+	}
+    }
+
+    public void reset() {
+	luigi.reset(0, 0, Direction.DOWN);
+	mario.reset(this.width-1, this.heigth-1, Direction.UP);
+    }
+
+    @Override
     public boolean newEnd() {
 	mario.win(this.luigi.getSnake().hitsSelf());
 	luigi.win(this.mario.getSnake().hitsSelf());
@@ -92,8 +108,7 @@ public class Multisnake extends Snakegame {
 	
         if (!(eatsApple(luigi) || eatsApple(mario))) { return; }
 
-        setApple(new Apple(new Random().nextInt(width),
-                    new Random().nextInt(heigth)));
+        setApple();
     }
 
     
