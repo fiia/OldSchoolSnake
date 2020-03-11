@@ -35,6 +35,15 @@ public class Snake {
              this.snakeParts.add(new Part(startX, newY));
         }
     }
+
+    public void reset(int startX, int startY, Direction startDirection) {
+	this.x = startX;
+        this.y = startY;
+        this.growth = false;
+        this.direction = startDirection;
+	this.snakeParts.clear();
+	start(startX, startY, direction);
+    }
     
     public Direction getDirection() { return this.direction; }
     
@@ -90,17 +99,14 @@ public class Snake {
     }
     
     public boolean hit(Part part) {
+	return getHead().hit(part);
+    }
 
-	//return getHead().hit(part);
-
-	
-        for(Part p : this.snakeParts) {
-	    if (p.hit(part)) {
-                return true;
-            }
-        }
-        return false;
-	
+    public boolean hitBody(Part part) {
+	for(Part sPart : getParts()) {
+	    if(!part.hit(sPart)) { return true; }
+	}
+	return false;
     }
 
     //TODO: DIES IF LEFT ARROW IS PRESSED WHILE DIRECTION IS RIGHT

@@ -4,8 +4,8 @@
  */
 
 public class Part {
-    private int x;
-    private int y;
+    protected int x;
+    protected int y;
     
     public Part(int x, int y) {
         this.x = x;

@@ -23,26 +23,28 @@ import java.util.ArrayList;
 
 //TODO: SPACE PAUSES
 //TODO: PREV BUTTON
-//TODO: HANDLE BOTH PLAYERS DYING AT THE SAME TIME
 
 public class App extends Application {
     private int gridsize = 20;
     private int grids = 30;
     private Tools tools = new Tools(gridsize, grids);
     private boolean onePlayer = true;
+    private ArrayList<Button> mbtns = tools.createModeButtons();
+    private ArrayList<Button> sbtns = tools.createSpeedButtons();
+    private ArrayList<Button> ebtns = tools.createEndButtons();
+    private Snakegame snakegame = new Snakegame(grids, grids);
+    private Multisnake multisnake = new Multisnake(grids, grids);
 
     @Override
     public void start(Stage window) throws Exception {
+	window.setTitle("SNAKE");
 	startForReal(window);
     }
 
     public void startForReal(Stage window) {
-	window.setTitle("SNAKE");
         Canvas canvas = new Canvas(grids * gridsize, grids * gridsize/3*2);
         GraphicsContext gc = canvas.getGraphicsContext2D();
 	tools.showText("SNAKE", gc, canvas, false);
-        Snakegame snakegame = new Snakegame(grids, grids);
-	Multisnake multisnake = new Multisnake(grids, grids);
 
 	//TEXT SCENE
 	BorderPane p = new BorderPane();
@@ -50,90 +52,72 @@ public class App extends Application {
 	Scene scene = new Scene(p);
 
 	//MODE BUTTONS
-	Button basic = new Button("BASIC");
-	Button notBasic = new Button("NEW");
-	Button multiBasic = new Button("TWO\nPLAYERS\nBASIC");
-	Button multiNew = new Button("TWO\nPLAYERS\nNEW");
-	ArrayList<Button> mbtns = new ArrayList<Button>();
-	mbtns.add(basic);
-	mbtns.add(notBasic);
-	mbtns.add(multiBasic);
-	mbtns.add(multiNew);
 	HBox hboxFirst = new HBox();
 	hboxFirst.setPrefHeight(grids * gridsize/3);
-	hboxFirst.getChildren().addAll(basic, notBasic, multiBasic, multiNew);
+	hboxFirst.getChildren().addAll(mbtns);
 	p.setBottom(hboxFirst);
 	tools.buttonLayout(mbtns, 4, hboxFirst, canvas.getWidth());
 	
 	//SPEED BUTTONS
-	Button fast = new Button("FAST");
-	Button mid = new Button("MID");
-	Button slow = new Button("SLOW");
 	HBox hbox = new HBox();
 	hbox.setPrefHeight(grids * gridsize/3);
-	hbox.getChildren().addAll(fast, mid, slow);
-	ArrayList<Button> sbtns = new ArrayList<Button>();
-	sbtns.add(fast);
-	sbtns.add(mid);
-	sbtns.add(slow);
+	hbox.getChildren().addAll(sbtns);
 	tools.buttonLayout(sbtns, 3, hbox, canvas.getWidth());
 	
-        basic.setOnAction(actionEvent -> {
-		window.setTitle("SNAKE BASIC");
-		snakegame.setBasicMode(true);
-		p.setBottom(hbox);
-		onePlayer = true;
-		tools.showText("SNAKE BASIC", gc, canvas, false);
-       	});
-
-        notBasic.setOnAction(actionEvent -> {
-		window.setTitle("SNAKE NEW");
-		snakegame.setBasicMode(false);
-		p.setBottom(hbox);
-		onePlayer = true;
-		tools.showText("SNAKE NEW", gc, canvas, false);
-       	});
-
-	multiBasic.setOnAction(actionEvent -> {
-		window.setTitle("SNAKE BASIC TWO PLAYERS");
-		p.setBottom(hbox);
-		tools.showText("SNAKE BASIC\nTWO PLAYERS", gc, canvas, false);
-		onePlayer = false;
-		multisnake.setBasicMode(true);
+        mbtns.get(0).setOnAction(actionEvent -> {
+		chooseMode(window, "SNAKE BASIC", true, true, p, hbox,
+			   "SNAKE BASIC", canvas, gc);
 	    });
 
-	multiNew.setOnAction(actionEvent -> {
-		window.setTitle("SNAKE NEW TWO PLAYERS");
-		p.setBottom(hbox);
-		tools.showText("SNAKE NEW\nTWO PLAYERS", gc, canvas, false);
-		onePlayer = false;
-		multisnake.setBasicMode(false);
+        mbtns.get(1).setOnAction(actionEvent -> {
+		chooseMode(window, "SNAKE NEW", true, false, p, hbox,
+			   "SNAKE NEW", canvas, gc);
+       	});
+
+	mbtns.get(2).setOnAction(actionEvent -> {
+		chooseMode(window, "SNAKE BASIC TWO PLAYERS", false, true, p, hbox,
+			   "SNAKE BASIC\nTWO PLAYERS", canvas, gc);
+       	});
+
+	mbtns.get(3).setOnAction(actionEvent -> {
+		chooseMode(window, "SNAKE NEW TWO PLAYERS", false, false, p, hbox,
+			   "SNAKE NEW\nTWO PLAYERS", canvas, gc);
 	    });
 	
-	fast.setOnAction(actionEvent -> {
-		int speed = 12;
-		if(onePlayer) { run(window, speed, snakegame, hbox); }
-	       	else { runTwo(window, speed, multisnake, hbox); }
+	sbtns.get(0).setOnAction(actionEvent -> {
+        	chooseSpeed(window, 12, hbox);
        	});
 
-	mid.setOnAction(actionEvent -> {
-		int speed = 8;
-		if(onePlayer) { run(window, speed, snakegame, hbox); }
-	       	else { runTwo(window, speed, multisnake, hbox); }
+	sbtns.get(1).setOnAction(actionEvent -> {
+		chooseSpeed(window, 8, hbox);
        	});
 
-	slow.setOnAction(actionEvent -> {
-		int speed = 4;
-		if(onePlayer) { run(window, speed, snakegame, hbox); }
-	       	else { runTwo(window, speed, multisnake, hbox); }
+	sbtns.get(2).setOnAction(actionEvent -> {
+        	chooseSpeed(window, 4, hbox);
        	});
 	
 	window.setScene(scene);
 	window.show();
 
     }
+
+    public void chooseMode(Stage window, String label, boolean onePlayer, boolean basicMode,
+			   BorderPane p, HBox hbox,
+			   String canvasText, Canvas canvas, GraphicsContext gc) {
+	window.setTitle(label);
+	if(onePlayer) { snakegame.setBasicMode(basicMode); }
+	else { multisnake.setBasicMode(basicMode); }
+	p.setBottom(hbox);
+	this.onePlayer = onePlayer;
+	tools.showText(canvasText, gc, canvas, false);
+    }
+
+    public void chooseSpeed(Stage window, int speed, HBox hbox) {
+	if(onePlayer) { run(window, speed, hbox); }
+    	else { runTwo(window, speed, hbox); }
+    }
    
-    public void run(Stage window, int speed, Snakegame snakegame, HBox hbox) {
+    public void run(Stage window, int speed, HBox hbox) {
 	Canvas canvas = new Canvas(grids * gridsize, grids * gridsize);
 	GraphicsContext gc = canvas.getGraphicsContext2D();
 	tools.showText("GAME STARTS", gc, canvas, false);
@@ -165,17 +149,16 @@ public class App extends Application {
 			tools.drawSnake(Color.GRAY, snakegame.getSnake(), gc);
 			String endScore = "GAME OVER\nSCORE: " + snakegame.getScore();
 			tools.showText(endScore, gc, canvas, true);			
-
-		    	ArrayList<Button>ebtns = tools.createEndButtons();
 			tools.endButtons(ebtns, ap);
 			
 			ebtns.get(0).setOnAction(actionEvent -> {
-			    Snakegame newSnakegame = new Snakegame(grids, grids);
-			    if(!snakegame.getMode()) { newSnakegame.setBasicMode(false); }
-				run(window, speed, newSnakegame, hbox);
+			    snakegame.reset();
+			    if(!snakegame.getMode()) { snakegame.setBasicMode(false); }
+			    run(window, speed, hbox);
 			    });
 			
 			ebtns.get(1).setOnAction(actionEvent -> {
+				snakegame.reset();
 				startForReal(window);
 			    });
 			
@@ -217,7 +200,7 @@ public class App extends Application {
 	
     }
 
-    public void runTwo(Stage window, int speed, Multisnake multisnake, HBox hbox) {
+    public void runTwo(Stage window, int speed, HBox hbox) {
 	Canvas canvas = new Canvas(grids * gridsize, grids * gridsize);
 	GraphicsContext gc = canvas.getGraphicsContext2D();
 	tools.showText("GAME STARTS\nYELLOW USE WASD\nBLUE USE ARROWS", gc, canvas, false);
@@ -230,7 +213,6 @@ public class App extends Application {
        	Scene snakeScene = new Scene(ap);
       	window.setScene(snakeScene);
 	window.show();
-	
 
 	new AnimationTimer() {
 	    private long prev;
@@ -248,17 +230,16 @@ public class App extends Application {
 		
 		    if (multisnake.end()) {
 			tools.drawDeadSnakes(multisnake, gc, canvas);
-			
-			ArrayList<Button>ebtns = tools.createEndButtons();
 			tools.endButtons(ebtns, ap);
 			
 			ebtns.get(0).setOnAction(actionEvent -> {
-			    Multisnake newMultisnake = new Multisnake(grids, grids);
-			    if(!multisnake.getMode()) { newMultisnake.setBasicMode(false); }
-				runTwo(window, speed, newMultisnake, hbox);
+			    multisnake.reset();
+			    if(!multisnake.getMode()) { multisnake.setBasicMode(false); }
+			    runTwo(window, speed, hbox);
 			    });
 			
 			ebtns.get(1).setOnAction(actionEvent -> {
+				multisnake.reset();
 				startForReal(window);
 			    });
 			

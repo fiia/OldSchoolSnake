@@ -35,6 +35,30 @@ public class Tools {
 	    });
     }
 
+    public ArrayList<Button> createModeButtons() {
+	Button basic = new Button("BASIC");
+	Button notBasic = new Button("NEW");
+	Button multiBasic = new Button("TWO\nPLAYERS\nBASIC");
+	Button multiNew = new Button("TWO\nPLAYERS\nNEW");
+	ArrayList<Button>mbtns = new ArrayList<Button>();
+	mbtns.add(basic);
+	mbtns.add(notBasic);
+	mbtns.add(multiBasic);
+	mbtns.add(multiNew);
+	return mbtns;
+    }
+
+    public ArrayList<Button> createSpeedButtons() {
+	Button fast = new Button("FAST");
+	Button mid = new Button("MID");
+	Button slow = new Button("SLOW");
+	ArrayList<Button>sbtns = new ArrayList<Button>();
+	sbtns.add(fast);
+	sbtns.add(mid);
+	sbtns.add(slow);
+	return sbtns;
+    }
+
     public ArrayList<Button> createEndButtons() {
 	Button playAgain = new Button("NEW GAME");
 	Button menu = new Button("MAIN MENU");
