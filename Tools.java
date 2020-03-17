@@ -25,10 +25,9 @@ public class Tools {
 	this.grids = grids;
     }
 
-    public void buttonLayout(ArrayList<Button> btns, int numButtons,
-			     HBox hbox, double width) {
+    public void buttonLayout(ArrayList<Button> btns, int numButtons, double width) {
 	btns.stream().forEach(b -> {
-	    b.setMinHeight(hbox.getPrefHeight());
+	    b.setMinHeight(grids * gridsize/3);
 	    b.setMinWidth(width/numButtons);
 	    b.setFont(new Font("Impact", (grids * gridsize)/19));
 	    b.setStyle("-fx-background-color:black;-fx-text-fill:white;-fx-border-style:solid;");
@@ -36,35 +35,28 @@ public class Tools {
     }
 
     public ArrayList<Button> createModeButtons() {
-	Button basic = new Button("BASIC");
-	Button notBasic = new Button("NEW");
-	Button multiBasic = new Button("TWO\nPLAYERS\nBASIC");
-	Button multiNew = new Button("TWO\nPLAYERS\nNEW");
 	ArrayList<Button>mbtns = new ArrayList<Button>();
-	mbtns.add(basic);
-	mbtns.add(notBasic);
-	mbtns.add(multiBasic);
-	mbtns.add(multiNew);
+	mbtns.add(new Button("BASIC"));
+	mbtns.add(new Button("NEW"));
+	mbtns.add(new Button("TWO\nPLAYERS\nBASIC"));
+	mbtns.add(new Button("TWO\nPLAYERS\nNEW"));
+	buttonLayout(mbtns, mbtns.size(), grids*gridsize);
 	return mbtns;
     }
 
     public ArrayList<Button> createSpeedButtons() {
-	Button fast = new Button("FAST");
-	Button mid = new Button("MID");
-	Button slow = new Button("SLOW");
 	ArrayList<Button>sbtns = new ArrayList<Button>();
-	sbtns.add(fast);
-	sbtns.add(mid);
-	sbtns.add(slow);
+	sbtns.add(new Button("FAST"));
+	sbtns.add(new Button("MID"));
+	sbtns.add(new Button("SLOW"));
+	buttonLayout(sbtns, sbtns.size(), grids*gridsize);
 	return sbtns;
     }
 
     public ArrayList<Button> createEndButtons() {
-	Button playAgain = new Button("NEW GAME");
-	Button menu = new Button("MAIN MENU");
 	ArrayList<Button>ebtns = new ArrayList<Button>();
-	ebtns.add(playAgain);
-	ebtns.add(menu);
+        ebtns.add(new Button("NEW GAME"));
+	ebtns.add(new Button("MAIN MENU"));
 	return ebtns;
     }
 
@@ -119,7 +111,8 @@ public class Tools {
 			     gridsize, gridsize);
      }
 
-    public void drawDeadSnakes(Multisnake multisnake, GraphicsContext gc, Canvas canvas) {
+    public void drawDeadSnakes(Multisnake multisnake, GraphicsContext gc,
+			       Canvas canvas) {
 	if(multisnake.bothDie()) {
 	    drawSnake(Color.GRAY, multisnake.getLuigi().getSnake(), gc);
 	    drawSnake(Color.GRAY, multisnake.getMario().getSnake(), gc);

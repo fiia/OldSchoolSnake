@@ -46,8 +46,11 @@ public class Snake {
     }
     
     public Direction getDirection() { return this.direction; }
-    
-    public void setDirection(Direction direction) { this.direction = direction; }
+
+    public void setDirection(Direction dir) {
+	this.direction = (this.direction.getValue() + dir.getValue() != 0) ?
+	    dir : this.direction;
+    }
     
     public int getLength() { return this.snakeParts.size(); }
 
@@ -109,8 +112,6 @@ public class Snake {
 	return false;
     }
 
-    //TODO: DIES IF LEFT ARROW IS PRESSED WHILE DIRECTION IS RIGHT
-    //THIS IS ANNOYING
     public boolean hitsSelf() {
 	for (int i=0; i<this.snakeParts.size()-1; i++) {
 	    if (getHead().hit(this.snakeParts.get(i))) {
