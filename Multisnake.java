@@ -38,9 +38,9 @@ public class Multisnake extends Snakegame {
     @Override
     public void setApple() {
 	apple.reset(new Random().nextInt(this.width),
-                new Random().nextInt(this.heigth));
-	while(!luigi.getSnake().hitBody(apple) &&
-	      !mario.getSnake().hitBody(apple)) {
+	      new Random().nextInt(this.heigth));
+	while(!(luigi.getSnake().hitBody(apple) &&
+		mario.getSnake().hitBody(apple))) {
 	    apple.reset(new Random().nextInt(this.width),
                 new Random().nextInt(this.heigth));
 	}

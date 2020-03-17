@@ -28,7 +28,7 @@ public class App extends Application {
     private int gridsize = 20;
     private int grids = 30;
     private Tools tools = new Tools(gridsize, grids);
-    private boolean onePlayer = true;
+    private boolean onePlayer;
     private ArrayList<Button> mbtns = tools.createModeButtons();
     private ArrayList<Button> sbtns = tools.createSpeedButtons();
     private ArrayList<Button> ebtns = tools.createEndButtons();
@@ -42,13 +42,14 @@ public class App extends Application {
     }
 
     public void startForReal(Stage window) {
-        Canvas canvas = new Canvas(grids * gridsize, grids * gridsize/3*2);
-        GraphicsContext gc = canvas.getGraphicsContext2D();
-	tools.showText("SNAKE", gc, canvas, false);
+	//MENU CANVAS
+        Canvas scanvas = new Canvas(grids * gridsize, grids * gridsize/3*2);
+        GraphicsContext gc = scanvas.getGraphicsContext2D();
+	tools.showText("SNAKE", gc, scanvas, false);
 
 	//TEXT SCENE
 	BorderPane p = new BorderPane();
-     	p.setCenter(canvas);
+     	p.setCenter(scanvas);
 	Scene scene = new Scene(p);
 
 	//MODE BUTTONS
@@ -56,68 +57,67 @@ public class App extends Application {
 	hboxFirst.setPrefHeight(grids * gridsize/3);
 	hboxFirst.getChildren().addAll(mbtns);
 	p.setBottom(hboxFirst);
-	tools.buttonLayout(mbtns, 4, hboxFirst, canvas.getWidth());
 	
 	//SPEED BUTTONS
 	HBox hbox = new HBox();
 	hbox.setPrefHeight(grids * gridsize/3);
 	hbox.getChildren().addAll(sbtns);
-	tools.buttonLayout(sbtns, 3, hbox, canvas.getWidth());
-	
+
+	//BUTTON ACTION	
         mbtns.get(0).setOnAction(actionEvent -> {
-		chooseMode(window, "SNAKE BASIC", true, true, p, hbox,
-			   "SNAKE BASIC", canvas, gc);
+		chooseMode(window, "SNAKE BASIC", snakegame, true, true, p, hbox,
+			   "SNAKE BASIC", scanvas, gc);
 	    });
 
         mbtns.get(1).setOnAction(actionEvent -> {
-		chooseMode(window, "SNAKE NEW", true, false, p, hbox,
-			   "SNAKE NEW", canvas, gc);
-       	});
+		chooseMode(window, "SNAKE NEW", snakegame, true, false, p, hbox,
+			   "SNAKE NEW", scanvas, gc);
+	    });
 
 	mbtns.get(2).setOnAction(actionEvent -> {
-		chooseMode(window, "SNAKE BASIC TWO PLAYERS", false, true, p, hbox,
-			   "SNAKE BASIC\nTWO PLAYERS", canvas, gc);
-       	});
+		chooseMode(window, "SNAKE BASIC TWO PLAYERS", multisnake, false, true,
+			   p, hbox, "SNAKE BASIC\nTWO PLAYERS", scanvas, gc);
+	    });
 
 	mbtns.get(3).setOnAction(actionEvent -> {
-		chooseMode(window, "SNAKE NEW TWO PLAYERS", false, false, p, hbox,
-			   "SNAKE NEW\nTWO PLAYERS", canvas, gc);
+		chooseMode(window, "SNAKE NEW TWO PLAYERS", multisnake, false, false,
+			   p, hbox, "SNAKE NEW\nTWO PLAYERS", scanvas, gc);
 	    });
-	
+
 	sbtns.get(0).setOnAction(actionEvent -> {
-        	chooseSpeed(window, 12, hbox);
-       	});
+        	chooseSpeed(window, 12);
+	    });
 
 	sbtns.get(1).setOnAction(actionEvent -> {
-		chooseSpeed(window, 8, hbox);
-       	});
+		chooseSpeed(window, 8);
+	    });
 
 	sbtns.get(2).setOnAction(actionEvent -> {
-        	chooseSpeed(window, 4, hbox);
-       	});
+        	chooseSpeed(window, 4);
+	    });
 	
 	window.setScene(scene);
 	window.show();
 
     }
 
-    public void chooseMode(Stage window, String label, boolean onePlayer, boolean basicMode,
-			   BorderPane p, HBox hbox,
-			   String canvasText, Canvas canvas, GraphicsContext gc) {
+    public void chooseMode(Stage window, String label, Snakegame game, boolean oneP,
+			   boolean basicMode, BorderPane p, HBox hbox,
+			   String canvasText, Canvas scanvas, GraphicsContext gc) {
 	window.setTitle(label);
-	if(onePlayer) { snakegame.setBasicMode(basicMode); }
-	else { multisnake.setBasicMode(basicMode); }
+	this.onePlayer = oneP;
+        game.setBasicMode(basicMode);
 	p.setBottom(hbox);
 	this.onePlayer = onePlayer;
-	tools.showText(canvasText, gc, canvas, false);
+	tools.showText(canvasText, gc, scanvas, false);
     }
 
-    public void chooseSpeed(Stage window, int speed, HBox hbox) {
-	if(onePlayer) { run(window, speed, hbox); }
-    	else { runTwo(window, speed, hbox); }
+    public void chooseSpeed(Stage window, int speed) {
+	if(onePlayer) { run(window, speed); }
+    	else { runTwo(window, speed); }
     }
    
-    public void run(Stage window, int speed, HBox hbox) {
+    public void run(Stage window, int speed) {
 	Canvas canvas = new Canvas(grids * gridsize, grids * gridsize);
 	GraphicsContext gc = canvas.getGraphicsContext2D();
 	tools.showText("GAME STARTS", gc, canvas, false);
@@ -153,8 +153,7 @@ public class App extends Application {
 			
 			ebtns.get(0).setOnAction(actionEvent -> {
 			    snakegame.reset();
-			    if(!snakegame.getMode()) { snakegame.setBasicMode(false); }
-			    run(window, speed, hbox);
+			    run(window, speed);
 			    });
 			
 			ebtns.get(1).setOnAction(actionEvent -> {
@@ -200,10 +199,11 @@ public class App extends Application {
 	
     }
 
-    public void runTwo(Stage window, int speed, HBox hbox) {
+    public void runTwo(Stage window, int speed) {
 	Canvas canvas = new Canvas(grids * gridsize, grids * gridsize);
 	GraphicsContext gc = canvas.getGraphicsContext2D();
-	tools.showText("GAME STARTS\nYELLOW USE WASD\nBLUE USE ARROWS", gc, canvas, false);
+	tools.showText("GAME STARTS\nYELLOW USE WASD\nBLUE USE ARROWS",
+		       gc, canvas, false);
 
 	//GAME SCENE
 	AnchorPane ap = new AnchorPane();
@@ -234,8 +234,7 @@ public class App extends Application {
 			
 			ebtns.get(0).setOnAction(actionEvent -> {
 			    multisnake.reset();
-			    if(!multisnake.getMode()) { multisnake.setBasicMode(false); }
-			    runTwo(window, speed, hbox);
+			    runTwo(window, speed);
 			    });
 			
 			ebtns.get(1).setOnAction(actionEvent -> {
@@ -270,7 +269,7 @@ public class App extends Application {
             }
 	}.start();
 
-	 //KEYBOARD LISTENER
+	//KEYBOARD LISTENER
         snakeScene.setOnKeyPressed((event) -> {
             KeyCode kc = event.getCode();
 	    switch(kc) {
@@ -285,11 +284,9 @@ public class App extends Application {
 	        default: break;
 	    }
         });
-
     }
 
     public static void main(String[] args) {
         launch(App.class);
     }
-
 }

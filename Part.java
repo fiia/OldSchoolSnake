@@ -23,5 +23,4 @@ public class Part {
     public boolean hit(Part part) {
         return (part.getX()==this.x && part.getY()==this.y);
     }
-
 }
