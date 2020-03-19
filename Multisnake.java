@@ -14,7 +14,7 @@ public class Multisnake extends Snakegame {
     public Multisnake(int width, int heigth) {
 	super(width, heigth);
 	this.luigi = new Player(0, 0, Direction.DOWN, width, heigth, Color.CYAN);
-	this.mario = new Player(this.width-1, this.heigth-1, Direction.UP,
+	this.mario = new Player(width-1, heigth-1, Direction.UP,
 				width, heigth, Color.GOLD);
         
     }
@@ -31,15 +31,15 @@ public class Multisnake extends Snakegame {
 	return (luigi.getWin() && mario.getWin());
     }
 
-    public Player getLuigi() { return this.luigi; }
+    public Player getLuigi() { return luigi; }
 
-    public Player getMario() { return this.mario; }
+    public Player getMario() { return mario; }
 
     @Override
     public void setApple() {
 	apple.reset(new Random().nextInt(this.width),
 	      new Random().nextInt(this.heigth));
-	while(!(luigi.getSnake().hitBody(apple) &&
+	while(!(luigi.getSnake().hitBody(apple) ||
 		mario.getSnake().hitBody(apple))) {
 	    apple.reset(new Random().nextInt(this.width),
                 new Random().nextInt(this.heigth));
@@ -53,8 +53,8 @@ public class Multisnake extends Snakegame {
 
     @Override
     public boolean newEnd() {
-	mario.win(this.luigi.getSnake().hitsSelf());
-	luigi.win(this.mario.getSnake().hitsSelf());
+	mario.win(luigi.getSnake().hitsSelf());
+	luigi.win(mario.getSnake().hitsSelf());
 
 	playerHitsPlayer(mario, luigi);
 	playerHitsPlayer(luigi, mario);

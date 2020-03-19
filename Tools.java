@@ -34,6 +34,13 @@ public class Tools {
 	    });
     }
 
+    public void buttonLayout(Button b) {
+	    b.setMinHeight(grids * gridsize/8);
+	    //b.setMinWidth(width/numButtons);
+	    b.setFont(new Font("Impact", (grids * gridsize)/21));
+	    b.setStyle("-fx-background-color:black;-fx-text-fill:white;-fx-border-style:solid;");
+    }
+
     public ArrayList<Button> createModeButtons() {
 	ArrayList<Button>mbtns = new ArrayList<Button>();
 	mbtns.add(new Button("BASIC"));

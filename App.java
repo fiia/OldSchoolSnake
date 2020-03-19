@@ -7,6 +7,7 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
@@ -32,6 +33,7 @@ public class App extends Application {
     private ArrayList<Button> mbtns = tools.createModeButtons();
     private ArrayList<Button> sbtns = tools.createSpeedButtons();
     private ArrayList<Button> ebtns = tools.createEndButtons();
+    Button goBack = new Button("RETURN");
     private Snakegame snakegame = new Snakegame(grids, grids);
     private Multisnake multisnake = new Multisnake(grids, grids);
 
@@ -56,32 +58,46 @@ public class App extends Application {
 	HBox hboxFirst = new HBox();
 	hboxFirst.setPrefHeight(grids * gridsize/3);
 	hboxFirst.getChildren().addAll(mbtns);
-	p.setBottom(hboxFirst);
+	//p.setBottom(hboxFirst);
 	
 	//SPEED BUTTONS
 	HBox hbox = new HBox();
 	hbox.setPrefHeight(grids * gridsize/3);
 	hbox.getChildren().addAll(sbtns);
 
+	//RETURN
+	tools.buttonLayout(goBack);
+	HBox scoreBoard = new HBox();
+	scoreBoard.setPrefHeight(grids*gridsize/8);
+
+	VBox empty = new VBox();
+	empty.getChildren().addAll(hboxFirst, scoreBoard);
+	p.setBottom(empty);
+
+	//KAHDEN ALAPALKIN JÄRJESTELY ENNEN NOPEUSNÄKYMÄÄ
+	VBox vbox = new VBox();
+	vbox.getChildren().addAll(hbox, scoreBoard);
+	
+
 	//BUTTON ACTION	
         mbtns.get(0).setOnAction(actionEvent -> {
 		chooseMode(window, "SNAKE BASIC", snakegame, true, true, p, hbox,
-			   "SNAKE BASIC", scanvas, gc);
+			   scoreBoard, vbox, "SNAKE BASIC", scanvas, gc);
 	    });
 
         mbtns.get(1).setOnAction(actionEvent -> {
 		chooseMode(window, "SNAKE NEW", snakegame, true, false, p, hbox,
-			   "SNAKE NEW", scanvas, gc);
+			   scoreBoard, vbox, "SNAKE NEW", scanvas, gc);
 	    });
 
 	mbtns.get(2).setOnAction(actionEvent -> {
 		chooseMode(window, "SNAKE BASIC TWO PLAYERS", multisnake, false, true,
-			   p, hbox, "SNAKE BASIC\nTWO PLAYERS", scanvas, gc);
+			   p, hbox, scoreBoard, vbox, "SNAKE BASIC\nTWO PLAYERS", scanvas, gc);
 	    });
 
 	mbtns.get(3).setOnAction(actionEvent -> {
 		chooseMode(window, "SNAKE NEW TWO PLAYERS", multisnake, false, false,
-			   p, hbox, "SNAKE NEW\nTWO PLAYERS", scanvas, gc);
+			   p, hbox, scoreBoard, vbox, "SNAKE NEW\nTWO PLAYERS", scanvas, gc);
 	    });
 
 	sbtns.get(0).setOnAction(actionEvent -> {
@@ -102,12 +118,14 @@ public class App extends Application {
     }
 
     public void chooseMode(Stage window, String label, Snakegame game, boolean oneP,
-			   boolean basicMode, BorderPane p, HBox hbox,
+			   boolean basicMode, BorderPane p, HBox hbox, HBox scoreB,
+			   VBox vbox, 
 			   String canvasText, Canvas scanvas, GraphicsContext gc) {
 	window.setTitle(label);
 	this.onePlayer = oneP;
         game.setBasicMode(basicMode);
-	p.setBottom(hbox);
+	scoreB.getChildren().add(goBack);
+	p.setBottom(vbox);
 	this.onePlayer = onePlayer;
 	tools.showText(canvasText, gc, scanvas, false);
     }
