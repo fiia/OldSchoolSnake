@@ -1,6 +1,7 @@
 import javafx.scene.control.Button;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
@@ -107,7 +108,11 @@ public class Tools {
     public void drawBackround(Color color, GraphicsContext gc) {
 		gc.setFill(color);
 	        gc.fillRect(0, 0, grids * gridsize, grids * gridsize);
-	    }
+    }
+
+    public void setBackgroundBlack(Pane item) {
+	item.setStyle("-fx-background-color:black;");
+    }
 
     public void drawSnake(Color color, Snake snake, GraphicsContext gc) {
 		gc.setFill(color);

@@ -55,15 +55,14 @@ public class App extends Application {
 	//TEXT SCENE
 	BorderPane p = new BorderPane();
      	p.setCenter(scanvas);
-	p.setStyle("-fx-background-color:black;");
+        tools.setBackgroundBlack(p);
 	Scene scene = new Scene(p);
 
 	//MODE BUTTONS
 	HBox hboxFirst = new HBox();
 	hboxFirst.setPrefHeight(grids * gridsize/3);
 	hboxFirst.getChildren().addAll(mbtns);
-	//p.setBottom(hboxFirst);
-	hboxFirst.setStyle("-fx-background-color:black;");
+	tools.setBackgroundBlack(hboxFirst);
 	hboxFirst.setAlignment(Pos.BOTTOM_CENTER);
 	
 	//SPEED BUTTONS
@@ -76,7 +75,7 @@ public class App extends Application {
 	tools.buttonLayout(goBack);
 	HBox scoreBoard = new HBox();
 	scoreBoard.setPrefHeight(grids*gridsize/12);
-	scoreBoard.setStyle("-fx-background-color:black;");
+	tools.setBackgroundBlack(scoreBoard);
 	
 	VBox empty = new VBox();
 	empty.getChildren().addAll(hboxFirst, scoreBoard);
@@ -159,7 +158,7 @@ public class App extends Application {
 	//SCORE AT BOTTOM OF PAGE
 	HBox scoreBoard = new HBox();
 	scoreBoard.setPrefHeight(grids*gridsize/12);
-	scoreBoard.setStyle("-fx-background-color:black;");
+	tools.setBackgroundBlack(scoreBoard);
 	Text score = tools.startScoreText(Color.WHITE);
 	scoreBoard.getChildren().add(score);
 	scoreBoard.setAlignment(Pos.CENTER);
@@ -196,15 +195,16 @@ public class App extends Application {
 			String endScore = "GAME OVER\nSCORE: " + snakegame.getScore();
 			tools.showText(endScore, gc, canvas, true);			
 			tools.endButtons(ebtns, ap);
-			
+
+			//END BUTTON ACTIONS
 			ebtns.get(0).setOnAction(actionEvent -> {
 			    snakegame.reset();
 			    run(window, speed);
 			    });
 			
 			ebtns.get(1).setOnAction(actionEvent -> {
-				snakegame.reset();
-				startForReal(window);
+			    snakegame.reset();
+			    startForReal(window);
 			    });
 			
 			return;
@@ -255,7 +255,7 @@ public class App extends Application {
 	//SCORE AT BOTTOM OF PAGE
         HBox scoreBoard = new HBox(40);
 	scoreBoard.setPrefHeight(grids*gridsize/12);
-	scoreBoard.setStyle("-fx-background-color:black;");
+	tools.setBackgroundBlack(scoreBoard);
 	Text scoreMario = tools.startScoreText(multisnake.getMario().getColor());
 	Text scoreLuigi = tools.startScoreText(multisnake.getLuigi().getColor());
 	scoreBoard.getChildren().addAll(scoreLuigi, scoreMario);
@@ -293,19 +293,21 @@ public class App extends Application {
 			scoreLuigi.setText("");
 			tools.drawDeadSnakes(multisnake, gc, canvas);
 			tools.endButtons(ebtns, ap);
-			
+
+			//END BUTTON ACTIONS
 			ebtns.get(0).setOnAction(actionEvent -> {
 			    multisnake.reset();
 			    runTwo(window, speed);
 			    });
 			
 			ebtns.get(1).setOnAction(actionEvent -> {
-				multisnake.reset();
-				startForReal(window);
+			    multisnake.reset();
+			    startForReal(window);
 			    });
 			
 			return;
 		    }
+		    
 		    tools.drawSnake(multisnake.getLuigi().getColor(),
 				    multisnake.getLuigi().getSnake(), gc);
 		    tools.drawSnake(multisnake.getMario().getColor(),
