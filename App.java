@@ -160,9 +160,7 @@ public class App extends Application {
 	HBox scoreBoard = new HBox();
 	scoreBoard.setPrefHeight(grids*gridsize/12);
 	scoreBoard.setStyle("-fx-background-color:black;");
-	Text score = new Text("SCORE: 0");
-	score.setFont(Font.font("Impact", 25));
-	score.setFill(Color.WHITE);
+	Text score = tools.startScoreText(Color.WHITE);
 	scoreBoard.getChildren().add(score);
 	scoreBoard.setAlignment(Pos.CENTER);
 
@@ -258,12 +256,8 @@ public class App extends Application {
         HBox scoreBoard = new HBox(40);
 	scoreBoard.setPrefHeight(grids*gridsize/12);
 	scoreBoard.setStyle("-fx-background-color:black;");
-	Text scoreMario = new Text("SCORE: 0");
-	Text scoreLuigi = new Text("SCORE: 0");
-	scoreMario.setFont(Font.font("Impact", 25));
-	scoreLuigi.setFont(Font.font("Impact", 25));
-	scoreMario.setFill(multisnake.getMario().getColor());
-	scoreLuigi.setFill(multisnake.getLuigi().getColor());
+	Text scoreMario = tools.startScoreText(multisnake.getMario().getColor());
+	Text scoreLuigi = tools.startScoreText(multisnake.getLuigi().getColor());
 	scoreBoard.getChildren().addAll(scoreLuigi, scoreMario);
 	scoreBoard.setAlignment(Pos.CENTER);
 

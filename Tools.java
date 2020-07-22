@@ -4,6 +4,7 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.scene.text.Font;
 import javafx.geometry.Pos;
@@ -94,6 +95,13 @@ public class Tools {
 	gc.setTextAlign(TextAlignment.CENTER);
 	gc.setFont(new Font("Impact", fsize));
 	gc.fillText(text, canvas.getWidth()/2, y);
+    }
+
+    public Text startScoreText(Color color) {
+	Text text = new Text("SCORE: 0");
+	text.setFont(Font.font("Impact", 25));
+	text.setFill(color);
+	return text;
     }
 
     public void drawBackround(Color color, GraphicsContext gc) {
