@@ -35,10 +35,11 @@ public class Tools {
     }
 
     public void buttonLayout(Button b) {
-	    b.setMinHeight(grids * gridsize/8);
-	    //b.setMinWidth(width/numButtons);
-	    b.setFont(new Font("Impact", (grids * gridsize)/21));
-	    b.setStyle("-fx-background-color:black;-fx-text-fill:white;-fx-border-style:solid;");
+	    b.setMinHeight(grids * gridsize/12);
+	    b.setMinWidth(grids * gridsize);
+	    b.setFont(new Font("Impact", (grids * gridsize)/25));
+	    b.setAlignment(Pos.BASELINE_LEFT);
+	    b.setStyle("-fx-background-color:black; -fx-text-fill:gray;-fx-border-style:solid;");
     }
 
     public ArrayList<Button> createModeButtons() {
@@ -74,7 +75,7 @@ public class Tools {
 	
 	ebtns.stream().forEach(b -> {
     	    b.setFont(new Font("Impact", (grids * gridsize)/12));
-	    b.setStyle("-fx-background-color:black;-fx-text-fill:white;-fx-border-style:solid;");
+	    b.setStyle("-fx-background-color:transparent;-fx-text-fill:white;-fx-border-color:transparent;");
 	    hboxEnd.getChildren().add(b);
 	    });
         

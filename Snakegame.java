@@ -45,7 +45,7 @@ public class Snakegame {
     public void setApple() {
 	apple.reset(new Random().nextInt(this.width),
                 new Random().nextInt(this.heigth));
-	while(!snake.hitBody(apple)) {
+	while(snake.hitBody(apple)) {
 	    apple.reset(new Random().nextInt(this.width),
                 new Random().nextInt(this.heigth));
 	}

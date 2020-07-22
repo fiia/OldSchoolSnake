@@ -107,7 +107,7 @@ public class Snake {
 
     public boolean hitBody(Part part) {
 	for(Part sPart : getParts()) {
-	    if(!part.hit(sPart)) { return true; }
+	    if(part.hit(sPart)) { return true; }
 	}
 	return false;
     }

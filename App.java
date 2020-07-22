@@ -1,5 +1,6 @@
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.canvas.Canvas;
@@ -8,9 +9,11 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
+import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.scene.text.Font;
 
@@ -23,7 +26,7 @@ import java.util.ArrayList;
  */
 
 //TODO: SPACE PAUSES
-//TODO: PREV BUTTON
+//TODO: MOVE ALL STYLING TO TOOLS
 
 public class App extends Application {
     private int gridsize = 20;
@@ -52,6 +55,7 @@ public class App extends Application {
 	//TEXT SCENE
 	BorderPane p = new BorderPane();
      	p.setCenter(scanvas);
+	p.setStyle("-fx-background-color:black;");
 	Scene scene = new Scene(p);
 
 	//MODE BUTTONS
@@ -59,24 +63,28 @@ public class App extends Application {
 	hboxFirst.setPrefHeight(grids * gridsize/3);
 	hboxFirst.getChildren().addAll(mbtns);
 	//p.setBottom(hboxFirst);
+	hboxFirst.setStyle("-fx-background-color:black;");
+	hboxFirst.setAlignment(Pos.BOTTOM_CENTER);
 	
 	//SPEED BUTTONS
 	HBox hbox = new HBox();
 	hbox.setPrefHeight(grids * gridsize/3);
 	hbox.getChildren().addAll(sbtns);
+	hbox.setAlignment(Pos.BOTTOM_CENTER);
 
 	//RETURN
 	tools.buttonLayout(goBack);
 	HBox scoreBoard = new HBox();
-	scoreBoard.setPrefHeight(grids*gridsize/8);
-
+	scoreBoard.setPrefHeight(grids*gridsize/12);
+	scoreBoard.setStyle("-fx-background-color:black;");
+	
 	VBox empty = new VBox();
 	empty.getChildren().addAll(hboxFirst, scoreBoard);
 	p.setBottom(empty);
 
 	//KAHDEN ALAPALKIN JÄRJESTELY ENNEN NOPEUSNÄKYMÄÄ
 	VBox vbox = new VBox();
-	vbox.getChildren().addAll(hbox, scoreBoard);
+	//vbox.getChildren().addAll(hbox, scoreBoard);
 	
 
 	//BUTTON ACTION	
@@ -91,13 +99,15 @@ public class App extends Application {
 	    });
 
 	mbtns.get(2).setOnAction(actionEvent -> {
-		chooseMode(window, "SNAKE BASIC TWO PLAYERS", multisnake, false, true,
-			   p, hbox, scoreBoard, vbox, "SNAKE BASIC\nTWO PLAYERS", scanvas, gc);
+		chooseMode(window, "SNAKE BASIC TWO PLAYERS", multisnake, false,
+			   true, p, hbox, scoreBoard, vbox, "SNAKE BASIC\nTWO PLAYERS",
+			   scanvas, gc);
 	    });
 
 	mbtns.get(3).setOnAction(actionEvent -> {
-		chooseMode(window, "SNAKE NEW TWO PLAYERS", multisnake, false, false,
-			   p, hbox, scoreBoard, vbox, "SNAKE NEW\nTWO PLAYERS", scanvas, gc);
+		chooseMode(window, "SNAKE NEW TWO PLAYERS", multisnake, false,
+			   false, p, hbox, scoreBoard, vbox, "SNAKE NEW\nTWO PLAYERS",
+			   scanvas, gc);
 	    });
 
 	sbtns.get(0).setOnAction(actionEvent -> {
@@ -110,6 +120,10 @@ public class App extends Application {
 
 	sbtns.get(2).setOnAction(actionEvent -> {
         	chooseSpeed(window, 4);
+	    });
+
+	goBack.setOnAction(actionEvent -> {
+		startForReal(window);
 	    });
 	
 	window.setScene(scene);
@@ -125,6 +139,7 @@ public class App extends Application {
 	this.onePlayer = oneP;
         game.setBasicMode(basicMode);
 	scoreB.getChildren().add(goBack);
+	vbox.getChildren().addAll(hbox, scoreB);
 	p.setBottom(vbox);
 	this.onePlayer = onePlayer;
 	tools.showText(canvasText, gc, scanvas, false);
@@ -134,17 +149,30 @@ public class App extends Application {
 	if(onePlayer) { run(window, speed); }
     	else { runTwo(window, speed); }
     }
-   
+
+    //RUN ONE PLAYER GAME
     public void run(Stage window, int speed) {
 	Canvas canvas = new Canvas(grids * gridsize, grids * gridsize);
 	GraphicsContext gc = canvas.getGraphicsContext2D();
 	tools.showText("GAME STARTS", gc, canvas, false);
 
+	//SCORE AT BOTTOM OF PAGE
+	HBox scoreBoard = new HBox();
+	scoreBoard.setPrefHeight(grids*gridsize/12);
+	scoreBoard.setStyle("-fx-background-color:black;");
+	Text score = new Text("SCORE: 0");
+	score.setFont(Font.font("Impact", 25));
+	score.setFill(Color.WHITE);
+	scoreBoard.getChildren().add(score);
+	scoreBoard.setAlignment(Pos.CENTER);
+
 	//GAME SCENE
 	AnchorPane ap = new AnchorPane();
-	ap.setPrefSize(grids * gridsize, grids * gridsize);
-	ap.setTopAnchor(canvas, 0.0);
-	ap.getChildren().addAll(canvas);
+	ap.setPrefSize(grids * gridsize, grids * gridsize + (grids*gridsize/12));
+	VBox gameBox = new VBox(2);
+	gameBox.getChildren().addAll(canvas, scoreBoard);
+	ap.getChildren().addAll(gameBox);
+
        	Scene snakeScene = new Scene(ap);
       	window.setScene(snakeScene);
 	window.show();
@@ -162,8 +190,10 @@ public class App extends Application {
 		    prev = now;
 		    tools.drawBackround(Color.BLACK, gc);
 		    tools.drawApple(Color.ORANGERED, snakegame, gc);
+		    score.setText("SCORE: " + snakegame.getScore());
 		
 		    if (snakegame.end()) {
+			score.setText("");
 			tools.drawSnake(Color.GRAY, snakegame.getSnake(), gc);
 			String endScore = "GAME OVER\nSCORE: " + snakegame.getScore();
 			tools.showText(endScore, gc, canvas, true);			
@@ -217,17 +247,33 @@ public class App extends Application {
 	
     }
 
+    //RUN TWO PLAYER GAME
     public void runTwo(Stage window, int speed) {
 	Canvas canvas = new Canvas(grids * gridsize, grids * gridsize);
 	GraphicsContext gc = canvas.getGraphicsContext2D();
 	tools.showText("GAME STARTS\nYELLOW USE WASD\nBLUE USE ARROWS",
 		       gc, canvas, false);
 
+	//SCORE AT BOTTOM OF PAGE
+        HBox scoreBoard = new HBox(40);
+	scoreBoard.setPrefHeight(grids*gridsize/12);
+	scoreBoard.setStyle("-fx-background-color:black;");
+	Text scoreMario = new Text("SCORE: 0");
+	Text scoreLuigi = new Text("SCORE: 0");
+	scoreMario.setFont(Font.font("Impact", 25));
+	scoreLuigi.setFont(Font.font("Impact", 25));
+	scoreMario.setFill(multisnake.getMario().getColor());
+	scoreLuigi.setFill(multisnake.getLuigi().getColor());
+	scoreBoard.getChildren().addAll(scoreLuigi, scoreMario);
+	scoreBoard.setAlignment(Pos.CENTER);
+
 	//GAME SCENE
 	AnchorPane ap = new AnchorPane();
 	ap.setPrefSize(grids * gridsize, grids * gridsize);
-	ap.setTopAnchor(canvas, 0.0);
-	ap.getChildren().addAll(canvas);
+        VBox gameBox = new VBox(2);
+	gameBox.getChildren().addAll(canvas, scoreBoard);
+	ap.getChildren().addAll(gameBox);
+
        	Scene snakeScene = new Scene(ap);
       	window.setScene(snakeScene);
 	window.show();
@@ -245,8 +291,12 @@ public class App extends Application {
 		    prev = now;
 		    tools.drawBackround(Color.BLACK, gc);
 		    tools.drawApple(Color.ORANGERED, multisnake, gc);
+		    scoreMario.setText("SCORE: " + multisnake.getMario().getScore());
+		    scoreLuigi.setText("SCORE: " + multisnake.getLuigi().getScore());
 		
 		    if (multisnake.end()) {
+			scoreMario.setText("");
+			scoreLuigi.setText("");
 			tools.drawDeadSnakes(multisnake, gc, canvas);
 			tools.endButtons(ebtns, ap);
 			
