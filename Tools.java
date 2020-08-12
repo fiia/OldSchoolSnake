@@ -1,9 +1,11 @@
 import javafx.scene.control.Button;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.scene.text.Font;
 import javafx.geometry.Pos;
@@ -32,6 +34,14 @@ public class Tools {
 	    b.setFont(new Font("Impact", (grids * gridsize)/19));
 	    b.setStyle("-fx-background-color:black;-fx-text-fill:white;-fx-border-style:solid;");
 	    });
+    }
+
+    public void buttonLayout(Button b) {
+	    b.setMinHeight(grids * gridsize/12);
+	    b.setMinWidth(grids * gridsize);
+	    b.setFont(new Font("Impact", (grids * gridsize)/25));
+	    b.setAlignment(Pos.BASELINE_LEFT);
+	    b.setStyle("-fx-background-color:black; -fx-text-fill:gray;-fx-border-style:solid;");
     }
 
     public ArrayList<Button> createModeButtons() {
@@ -67,7 +77,7 @@ public class Tools {
 	
 	ebtns.stream().forEach(b -> {
     	    b.setFont(new Font("Impact", (grids * gridsize)/12));
-	    b.setStyle("-fx-background-color:black;-fx-text-fill:white;-fx-border-style:solid;");
+	    b.setStyle("-fx-background-color:transparent;-fx-text-fill:white;-fx-border-color:transparent;");
 	    hboxEnd.getChildren().add(b);
 	    });
         
@@ -88,10 +98,21 @@ public class Tools {
 	gc.fillText(text, canvas.getWidth()/2, y);
     }
 
+    public Text startScoreText(Color color) {
+	Text text = new Text("SCORE: 0");
+	text.setFont(Font.font("Impact", 25));
+	text.setFill(color);
+	return text;
+    }
+
     public void drawBackround(Color color, GraphicsContext gc) {
 		gc.setFill(color);
 	        gc.fillRect(0, 0, grids * gridsize, grids * gridsize);
-	    }
+    }
+
+    public void setBackgroundBlack(Pane item) {
+	item.setStyle("-fx-background-color:black;");
+    }
 
     public void drawSnake(Color color, Snake snake, GraphicsContext gc) {
 		gc.setFill(color);

@@ -18,10 +18,10 @@ public class Snakegame {
         this.width = width;
         this.heigth = heigth;
 	this.score = 0;
-	this.basic = true; //DIES IF HITS A WALL
-        this.snake = new Snake(this.width/2, 0, Direction.DOWN, this.width, this.heigth);
-	this.apple = new Apple(new Random().nextInt(this.width),
-				new Random().nextInt(this.heigth));
+	this.basic = true; //DIES IF HITS WALL
+        this.snake = new Snake(width/2, 0, Direction.DOWN, width, heigth);
+	this.apple = new Apple(new Random().nextInt(width),
+				new Random().nextInt(heigth));
     }
 
     public void setBasicMode(boolean isBasic) { this.basic = isBasic; }
@@ -45,7 +45,7 @@ public class Snakegame {
     public void setApple() {
 	apple.reset(new Random().nextInt(this.width),
                 new Random().nextInt(this.heigth));
-	while(!snake.hitBody(apple)) {
+	while(snake.hitBody(apple)) {
 	    apple.reset(new Random().nextInt(this.width),
                 new Random().nextInt(this.heigth));
 	}
@@ -64,8 +64,8 @@ public class Snakegame {
     
     public boolean basicEnd() {
         Part part = snake.getHead();
-        return ((part.getX()>this.width-1 || part.getX()<0) ||
-                (part.getY()>this.heigth-1 || part.getY()<0)) ||
+        return (part.getX()>this.width-1 || part.getX()<0 ||
+                part.getY()>this.heigth-1 || part.getY()<0) ||
 	        this.snake.hitsSelf();
     }
     
