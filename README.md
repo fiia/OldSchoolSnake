@@ -1,4 +1,5 @@
 <h1>Old school Snake game</h1>
+<h2>JavaFX</h2>
 <ul>
 <li>One player and two player games (same screen & keyboard)</li>
 <li>Three speed options</li>
